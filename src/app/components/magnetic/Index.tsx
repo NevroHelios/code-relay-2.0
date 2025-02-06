@@ -39,7 +39,7 @@ export default function Index({children}:{children: React.ReactNode}) {
     return (
         React.isValidElement(children)
             // ? React.cloneElement(children, { ref: magnetic as React.Ref<unknown> })//-
-            ? React.cloneElement(children as React.ReactElement, { ref: magnetic })//+
+            ? React.cloneElement(children as React.ReactElement<any>, { ref: magnetic })//+
             : children
     )
 }
