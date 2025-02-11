@@ -2,7 +2,6 @@
 pragma solidity ^0.8.20;
 
 contract Garbage1 {
-
     event NewZombie(uint zombieId, string name, uint dna);
 
     uint dnaDigits = 16;
@@ -14,5 +13,4 @@ contract Garbage1 {
     }
 
     Zombie[] public zombies;
-
 }

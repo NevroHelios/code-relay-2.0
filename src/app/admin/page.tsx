@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Web3 from 'web3';
 // import { useRouter } from 'next/router';
-import GarbageNFTAbi from '../../../build/contracts/GarbageNFT.json';
+import GarbageNFTAbi from '@/../build/contracts/Garbage1.json';
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
