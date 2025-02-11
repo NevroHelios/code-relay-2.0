@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import Web3 from 'web3';
 import GarbageNFT from '../../build/contracts/GarbageNFT.json';
