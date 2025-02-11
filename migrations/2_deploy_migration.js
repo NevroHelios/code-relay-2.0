@@ -1,5 +1,5 @@
-const GarbageNFT = artifacts.require("./GarbageNFT");
+const Garbage1 = artifacts.require("./Garbage1");
 
 module.exports = function (deployer) {
-  deployer.deploy(GarbageNFT);
+  deployer.deploy(Garbage1);
 };
