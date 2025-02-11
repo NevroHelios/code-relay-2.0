@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'; // corrected import for app directory
 import Web3 from 'web3';
+<<<<<<< HEAD
+// import { useRouter } from 'next/router';
+import GarbageNFTAbi from '@/../build/contracts/Garbage1.json';
+=======
 import GarbageNFTAbi from '../../../build/contracts/GarbageNFT.json';
+>>>>>>> 1f6d43f2125baf9c3523755b158eb3a853f36b49
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
