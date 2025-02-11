@@ -2,7 +2,7 @@
 
 
 import { useEffect, useState } from 'react';
-import { NFT } from '../types';
+import { NFT } from '../../types';
 
 export default function Collections() {
   const [nfts, setNfts] = useState<NFT[]>([]);

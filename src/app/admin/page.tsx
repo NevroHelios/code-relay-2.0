@@ -1,15 +1,20 @@
 "use client"
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation'; // corrected import for app directory
 import Web3 from 'web3';
+<<<<<<< HEAD
 // import { useRouter } from 'next/router';
 import GarbageNFTAbi from '@/../build/contracts/Garbage1.json';
+=======
+import GarbageNFTAbi from '../../../build/contracts/GarbageNFT.json';
+>>>>>>> 1f6d43f2125baf9c3523755b158eb3a853f36b49
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
 export default function AdminDashboard() {
   const [tokenURI, setTokenURI] = useState('');
-  // const router = useRouter();
+  const router = useRouter();
 
   const createNFT = async () => {
     try {
@@ -48,10 +53,12 @@ export default function AdminDashboard() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save NFT metadata');
+        const errorDetails = await response.text();
+        throw new Error(`Failed to save NFT metadata: ${errorDetails}`);
       }
 
-      // router.push('/collections');
+      // Redirect to collections page
+      router.push('/collections');
     } catch (error) {
       console.error('Error creating NFT:', error);
     }
@@ -60,44 +67,29 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-10">
-        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
-        Admin Dashboard
-        </h1>
-        <p className="mt-2 text-lg text-gray-600">
-        Create and manage your NFT collection
-        </p>
-      </div>
-      
-      <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-        <div className="space-y-6">
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-          Token URI
-          </label>
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+            Admin Dashboard
+          </h1>
+          <p className="mt-2 text-lg text-gray-600">
+            Create and manage your NFT collection
+          </p>
+        </div>
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <input
-          type="text"
-          value={tokenURI}
-          onChange={(e) => setTokenURI(e.target.value)}
-          className="mt-1 block w-full px-4 py-3 rounded-lg border border-gray-200 
-          focus:ring-2 focus:ring-indigo-500 focus:border-transparent
-          transition duration-150 ease-in-out"
-          placeholder="Enter token URI..."
+            type="text"
+            placeholder="Enter image URL"
+            value={tokenURI}
+            onChange={(e) => setTokenURI(e.target.value)}
+            className="w-full p-2 border border-gray-300 text-black rounded-md mb-4"
           />
+          <button
+            onClick={createNFT}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+          >
+            Create NFT
+          </button>
         </div>
-        
-        <button
-          onClick={createNFT}
-          className="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg
-          hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 
-          focus:ring-offset-2 transform transition duration-200 ease-in-out
-          hover:scale-[1.02] active:scale-[0.98] font-medium text-lg
-          shadow-md hover:shadow-lg"
-        >
-          Create NFT
-        </button>
-        </div>
-      </div>
       </div>
     </div>
   );
