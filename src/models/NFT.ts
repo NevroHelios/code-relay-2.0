@@ -17,12 +17,8 @@ const NFTSchema = new mongoose.Schema({
   claimedBy: {
     type: String,
     default: null,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  }
+}, {timestamps: true});
 
 // Add index for faster queries
 NFTSchema.index({ tokenId: 1 });
