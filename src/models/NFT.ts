@@ -24,4 +24,7 @@ const NFTSchema = new mongoose.Schema({
   },
 });
 
+// Add index for faster queries
+NFTSchema.index({ tokenId: 1 });
+
 export default mongoose.models.NFT || mongoose.model('NFT', NFTSchema);

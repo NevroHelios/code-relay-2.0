@@ -10,12 +10,25 @@ export default async function handler(
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  await dbConnect();
-
   try {
-    const nft = await NFT.create(req.body);
+    await dbConnect();
+
+    const { tokenId, tokenURI, creator } = req.body;
+
+    // Validate required fields
+    if (!tokenId || !tokenURI || !creator) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    const nft = await NFT.create({
+      tokenId,
+      tokenURI,
+      creator,
+    });
+
     res.status(201).json(nft);
   } catch (error) {
-    res.status(400).json({ error });
+    console.error('Error creating NFT:', error);
+    res.status(500).json({ message: 'Error creating NFT', error: error instanceof Error ? error.message : 'Unknown error' });
   }
 }
