@@ -24,6 +24,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "chai": "^5.1.2",
     "ethers": "^5.7.2",
     "hardhat": "^2.22.18",
     "postcss": "^8",
