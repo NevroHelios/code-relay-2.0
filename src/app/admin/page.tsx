@@ -76,7 +76,7 @@ export default function AdminDashboard() {
             placeholder="Enter image URL"
             value={tokenURI}
             onChange={(e) => setTokenURI(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md mb-4"
+            className="w-full p-2 border border-gray-300 text-black rounded-md mb-4"
           />
           <button
             onClick={createNFT}
