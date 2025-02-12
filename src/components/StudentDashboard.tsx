@@ -24,7 +24,7 @@ const StudentDashboard: React.FC = () => {
             if (window.ethereum) {
                 const web3Instance = new Web3(window.ethereum);
                 try {
-                    await window.ethereum.enable();
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
                     setWeb3(web3Instance);
 
                     const accounts: string[] = await web3Instance.eth.getAccounts();
