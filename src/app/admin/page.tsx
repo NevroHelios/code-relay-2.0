@@ -1,134 +1,56 @@
 'use client'
 
-import React, { useState, ChangeEvent, useEffect } from 'react';
-import Web3 from 'web3';
-import GarbageNFT from '@/../build/contracts/GarbageNFT.json';
+import React, { useState, ChangeEvent } from 'react';
+import {
+  ThirdwebProvider,
+  useAddress,
+  useMetamask,
+  useContract,
+  useNetwork
+} from '@thirdweb-dev/react';
 
 const AdminDashboard: React.FC = () => {
-  const [web3, setWeb3] = useState<Web3 | null>(null);
-  const [contract, setContract] = useState<any>(null);
-  const [account, setAccount] = useState<string>('');
+  const address = useAddress();
+  const connectWithMetamask = useMetamask();
+  // Use your deployed Sepolia contract address here after deployment
+  const contractAddress = "0xYourSepoliaDeployedContractAddress";
+  const { contract, isLoading } = useContract(contractAddress);
+
   const [tokenURI, setTokenURI] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
-  const [studentAddress, setStudentAddress] = useState<string>('');
-  const [rewardId, setRewardId] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const { chainId, switchNetwork } = useNetwork();
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        if (!window.ethereum) {
-          throw new Error("Please install MetaMask!");
-        }
-
-        // Request account access
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        
-        // Initialize Web3
-        const web3Instance = new Web3(window.ethereum);
-        setWeb3(web3Instance);
-
-        // Get network ID
-        const networkId = await web3Instance.eth.net.getId();
-        console.log("Connected to network ID:", networkId);
-
-        // Get the first account
-        const accounts = await web3Instance.eth.getAccounts();
-        setAccount(accounts[0]);
-
-        // Initialize contract
-        const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-        const contractInstance = new web3Instance.eth.Contract(
-          GarbageNFT.abi as any,
-          contractAddress
-        );
-        setContract(contractInstance);
-
-        // Listen for account changes
-        window.ethereum.on('accountsChanged', (accounts: string[]) => {
-          setAccount(accounts[0]);
-        });
-
-      } catch (error) {
-        console.error("Initialization failed:", error);
-        alert(`Failed to initialize: ${error.message}`);
-      }
-    };
-
-    init();
-  }, []);
+  // Sepolia chainId is 11155111
+  if (chainId !== 11155111) {
+    switchNetwork && switchNetwork(11155111);
+  }
 
   const createReward = async () => {
-    if (!contract || !account || !web3) {
-      alert("Please connect your wallet first");
+    if (!contract) {
+      alert("Contract not loaded");
       return;
     }
-
+    if (!address) {
+      connectWithMetamask();
+      return;
+    }
     setLoading(true);
     try {
-      // Validate inputs
       if (!tokenURI || !title || !description) {
         throw new Error("Please fill in all fields");
       }
-
-      console.log("Creating reward with params:", {
-        tokenURI,
-        title,
-        description,
-        from: account
-      });
-
-      // Create the reward
-      const result = await contract.methods
-        .createReward(tokenURI, title, description)
-        .send({ 
-          from: account,
-          gas: 8900000 // Set a reasonable gas limit
-        });
-
-      console.log("Transaction successful:", result);
-      
-      // Clear form
+      console.log("Creating reward with params:", { tokenURI, title, description, from: address });
+      const tx = await contract.call("createReward", tokenURI, title, description);
+      console.log("Transaction successful:", tx);
+      alert("Reward created successfully!");
       setTokenURI('');
       setTitle('');
       setDescription('');
-      
-      alert("Reward created successfully!");
-
-    } catch (error) {
+    } catch (error: any) {
       console.error("Transaction failed:", error);
       alert(`Failed to create reward: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const approveStudent = async () => {
-    if (!contract || !account) {
-      alert("Please connect your wallet first");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      if (!rewardId || !studentAddress) {
-        throw new Error("Please fill in all fields");
-      }
-
-      await contract.methods
-        .approveStudentForReward(rewardId, studentAddress)
-        .send({ 
-          from: account,
-          gas: 8900000
-        });
-
-      setStudentAddress('');
-      setRewardId('');
-      alert('Student approved successfully!');
-    } catch (error) {
-      console.error('Error approving student:', error);
-      alert(`Failed to approve student: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -137,8 +59,6 @@ const AdminDashboard: React.FC = () => {
   const handleTokenURIChange = (e: ChangeEvent<HTMLInputElement>) => setTokenURI(e.target.value);
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value);
   const handleDescriptionChange = (e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value);
-  const handleRewardIdChange = (e: ChangeEvent<HTMLInputElement>) => setRewardId(e.target.value);
-  const handleStudentAddressChange = (e: ChangeEvent<HTMLInputElement>) => setStudentAddress(e.target.value);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -200,8 +120,9 @@ const AdminDashboard: React.FC = () => {
               <button 
                 onClick={createReward}
                 className="w-full bg-gradient-to-r from-green-400 to-green-600 text-white py-2 px-4 rounded-lg hover:from-green-500 hover:to-green-700 transition duration-300 transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                disabled={loading || isLoading}
               >
-                Create Reward 🎉
+                {loading ? "Creating Reward..." : "Create Reward 🎉"}
               </button>
             </div>
           </div>
@@ -225,8 +146,6 @@ const AdminDashboard: React.FC = () => {
                 <input
                   type="number"
                   placeholder="Enter reward ID..."
-                  value={rewardId}
-                  onChange={handleRewardIdChange}
                   className="w-full p-2 border border-gray-300 text-black rounded-md mb-4"
                 />
               </div>
@@ -237,13 +156,10 @@ const AdminDashboard: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Enter student address..."
-                  value={studentAddress}
-                  onChange={handleStudentAddressChange}
                   className="w-full p-2 border border-gray-300 text-black rounded-md mb-4"
                 />
               </div>
               <button 
-                onClick={approveStudent}
                 className="w-full bg-gradient-to-r from-blue-400 to-blue-600 text-white py-2 px-4 rounded-lg hover:from-blue-500 hover:to-blue-700 transition duration-300 transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
                 Approve Student 🎓
@@ -256,4 +172,10 @@ const AdminDashboard: React.FC = () => {
   );
 };
 
-export default AdminDashboard;
+export default function WrappedAdminDashboard() {
+  return (
+    <ThirdwebProvider desiredChainId={11155111}>
+      <AdminDashboard />
+    </ThirdwebProvider>
+  );
+}
