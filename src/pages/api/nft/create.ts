@@ -7,28 +7,29 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
+    res.setHeader("Allow", ["POST"]);
+    return res.status(405).json({ message: `Method ${req.method} not allowed` });
   }
 
   try {
     await dbConnect();
+    const { tokenId, tokenURI, creator, title, description } = req.body;
 
-    const { tokenId, tokenURI, creator } = req.body;
-
-    // Validate required fields
-    if (!tokenId || !tokenURI || !creator) {
-      return res.status(400).json({ message: 'Missing required fields' });
+    if (!tokenId || !tokenURI || !creator || !title || !description) {
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
     const nft = await NFT.create({
       tokenId,
       tokenURI,
       creator,
+      title,
+      description,
     });
 
-    res.status(201).json(nft);
+    return res.status(201).json(nft);
   } catch (error) {
     console.error('Error creating NFT:', error);
-    res.status(500).json({ message: 'Error creating NFT', error: error instanceof Error ? error.message : 'Unknown error' });
+    return res.status(500).json({ message: 'Error creating NFT', error: error instanceof Error ? error.message : 'Unknown error' });
   }
 }

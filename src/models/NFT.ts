@@ -17,10 +17,17 @@ const NFTSchema = new mongoose.Schema({
   claimedBy: {
     type: String,
     default: null,
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
   }
-}, {timestamps: true});
+}, { timestamps: true });
 
-// Add index for faster queries
 NFTSchema.index({ tokenId: 1 });
 
 export default mongoose.models.NFT || mongoose.model('NFT', NFTSchema);
