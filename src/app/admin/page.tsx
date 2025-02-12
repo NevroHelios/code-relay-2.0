@@ -4,11 +4,6 @@ import React, { useState, ChangeEvent, useEffect } from 'react';
 import Web3 from 'web3';
 import GarbageNFT from '@/../build/contracts/GarbageNFT.json';
 
-interface WindowWithEthereum {
-  ethereum?: any;
-}
-declare let window: WindowWithEthereum;
-
 const AdminDashboard: React.FC = () => {
   const [web3, setWeb3] = useState<Web3 | null>(null);
   const [contract, setContract] = useState<any>(null);
@@ -18,109 +13,46 @@ const AdminDashboard: React.FC = () => {
   const [description, setDescription] = useState<string>('');
   const [studentAddress, setStudentAddress] = useState<string>('');
   const [rewardId, setRewardId] = useState<string>('');
-
-  const verifyContract = async (web3Instance: Web3, contractInstance: any) => {
-    try {
-      if (!web3Instance || !contractInstance) {
-        throw new Error("Web3 or contract not initialized");
-      }
-      if (!process.env.NEXT_PUBLIC_CONTRACT_ADDRESS) {
-        throw new Error("Contract address is not defined in environment variables");
-      }
-
-      // Check contract bytecode
-      const code = await web3Instance.eth.getCode(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
-      console.log("Contract bytecode exists:", code !== '0x');
-
-      // Check basic contract methods
-      const name = await contractInstance.methods.name().call();
-      const symbol = await contractInstance.methods.symbol().call();
-      console.log("Contract name:", name);
-      console.log("Contract symbol:", symbol);
-
-      // Check contract owner
-      const owner = await contractInstance.methods.owner().call();
-      console.log("Contract owner:", owner);
-
-      return true;
-    } catch (error) {
-      console.error("Contract verification failed:", error);
-      return false;
-    }
-  };
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const init = async () => {
-      let provider = window.ethereum;
-      if (!provider) {
-        console.log("window.ethereum not found, falling back to Hardhat provider at http://127.0.0.1:8545");
-        provider = new Web3.providers.HttpProvider("http://127.0.0.1:8545");
-      } else {
-        console.log("window.ethereum detected:", provider);
-      }
-      const web3Instance = new Web3(provider);
-      console.log("Web3 instance created:", web3Instance);
-
       try {
-        if (window.ethereum) {
-          // Request account access
-          await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-          // Add Hardhat network if not already added
-          try {
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [{
-                chainId: '0x7A69',
-                chainName: 'Hardhat',
-                nativeCurrency: {
-                  name: 'ETH',
-                  symbol: 'ETH',
-                  decimals: 18
-                },
-                rpcUrls: ['http://127.0.0.1:8545']
-              }]
-            });
-          } catch (addError) {
-            console.error('Error adding Hardhat network:', addError);
-          }
+        if (!window.ethereum) {
+          throw new Error("Please install MetaMask!");
         }
 
+        // Request account access
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        
+        // Initialize Web3
+        const web3Instance = new Web3(window.ethereum);
         setWeb3(web3Instance);
+
+        // Get network ID
+        const networkId = await web3Instance.eth.net.getId();
+        console.log("Connected to network ID:", networkId);
+
+        // Get the first account
         const accounts = await web3Instance.eth.getAccounts();
-        console.log("Fetched accounts:", accounts);
-        if (accounts.length === 0) {
-          console.error("No accounts detected");
-          return;
-        }
         setAccount(accounts[0]);
 
-        const networkId = await web3Instance.eth.net.getId();
-        console.log("Detected networkId:", networkId);
-
-        let contractAddress;
-        if (GarbageNFT.networks[networkId] && GarbageNFT.networks[networkId].address) {
-          contractAddress = GarbageNFT.networks[networkId].address;
-          console.log("Contract found in GarbageNFT.networks for networkId", networkId, "Address:", contractAddress);
-        } else if (process.env.NEXT_PUBLIC_CONTRACT_ADDRESS) {
-          contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
-          console.log("Using contract address from .env:", contractAddress);
-        } else {
-          console.error("Contract not deployed on the current network.");
-          return;
-        }
-
+        // Initialize contract
+        const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
         const contractInstance = new web3Instance.eth.Contract(
-          GarbageNFT.abi,
+          GarbageNFT.abi as any,
           contractAddress
         );
-        console.log("Contract instance created:", contractInstance);
         setContract(contractInstance);
 
-        // Verify contract using the initialized web3 and contract instances
-        await verifyContract(web3Instance, contractInstance);
+        // Listen for account changes
+        window.ethereum.on('accountsChanged', (accounts: string[]) => {
+          setAccount(accounts[0]);
+        });
+
       } catch (error) {
-        console.error("Error during initialization:", error);
+        console.error("Initialization failed:", error);
+        alert(`Failed to initialize: ${error.message}`);
       }
     };
 
@@ -129,62 +61,76 @@ const AdminDashboard: React.FC = () => {
 
   const createReward = async () => {
     if (!contract || !account || !web3) {
-      console.error("Contract, account, or web3 not initialized");
+      alert("Please connect your wallet first");
       return;
     }
 
+    setLoading(true);
     try {
-      // 1. Verify account is owner
-      const owner = await contract.methods.owner().call();
-      console.log("Contract owner:", owner);
-      console.log("Current account:", account);
-      
-      if (owner.toLowerCase() !== account.toLowerCase()) {
-        alert("Only contract owner can create rewards");
-        return;
-      }
-
-      // 2. Basic input validation
+      // Validate inputs
       if (!tokenURI || !title || !description) {
-        alert("Please fill in all fields");
-        return;
+        throw new Error("Please fill in all fields");
       }
 
-      // 3. Check network
-      const networkId = await web3.eth.net.getId();
-      console.log("Current network ID:", networkId);
-      
-      // 4. Create reward with explicit params
-      const tx = await contract.methods.createReward(tokenURI, title, description).send({
-        from: account,
-        gas: 3000000, // Explicit gas limit
-        gasPrice: await web3.eth.getGasPrice()
+      console.log("Creating reward with params:", {
+        tokenURI,
+        title,
+        description,
+        from: account
       });
 
-      console.log("Transaction successful:", tx);
-      alert("Reward created successfully!");
+      // Create the reward
+      const result = await contract.methods
+        .createReward(tokenURI, title, description)
+        .send({ 
+          from: account,
+          gas: 8900000 // Set a reasonable gas limit
+        });
+
+      console.log("Transaction successful:", result);
       
-      // 5. Reset form
+      // Clear form
       setTokenURI('');
       setTitle('');
       setDescription('');
+      
+      alert("Reward created successfully!");
 
-    } catch (error: any) {
-      console.error("Detailed error:", error);
+    } catch (error) {
+      console.error("Transaction failed:", error);
       alert(`Failed to create reward: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
   const approveStudent = async () => {
-    if (!contract) return;
+    if (!contract || !account) {
+      alert("Please connect your wallet first");
+      return;
+    }
+
+    setLoading(true);
     try {
-      await contract.methods.approveStudentForReward(rewardId, studentAddress)
-        .send({ from: account });
-      alert('Student approved successfully!');
+      if (!rewardId || !studentAddress) {
+        throw new Error("Please fill in all fields");
+      }
+
+      await contract.methods
+        .approveStudentForReward(rewardId, studentAddress)
+        .send({ 
+          from: account,
+          gas: 8900000
+        });
+
       setStudentAddress('');
       setRewardId('');
+      alert('Student approved successfully!');
     } catch (error) {
       console.error('Error approving student:', error);
+      alert(`Failed to approve student: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
