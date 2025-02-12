@@ -13,20 +13,15 @@ const AdminDashboard: React.FC = () => {
   const address = useAddress();
   const connectWithMetamask = useMetamask();
   // Use your deployed Sepolia contract address here after deployment
-  const contractAddress = "0xYourSepoliaDeployedContractAddress";
+  const contractAddress = "0xaA0801BfA7F39501b95D2F7A5f27Ea78Fbe1226C";
   const { contract, isLoading } = useContract(contractAddress);
 
   const [tokenURI, setTokenURI] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const { chainId, switchNetwork } = useNetwork();
 
-  // Sepolia chainId is 11155111
-  if (chainId !== 11155111) {
-    switchNetwork && switchNetwork(11155111);
-  }
-
+  
   const createReward = async () => {
     if (!contract) {
       alert("Contract not loaded");
@@ -42,7 +37,7 @@ const AdminDashboard: React.FC = () => {
         throw new Error("Please fill in all fields");
       }
       console.log("Creating reward with params:", { tokenURI, title, description, from: address });
-      const tx = await contract.call("createReward", tokenURI, title, description);
+      const tx = await contract.call("createReward", [tokenURI, title, description]);
       console.log("Transaction successful:", tx);
       alert("Reward created successfully!");
       setTokenURI('');
@@ -172,10 +167,12 @@ const AdminDashboard: React.FC = () => {
   );
 };
 
-export default function WrappedAdminDashboard() {
+const App = () => {
   return (
-    <ThirdwebProvider desiredChainId={11155111}>
+    <ThirdwebProvider activeChain="sepolia">
       <AdminDashboard />
     </ThirdwebProvider>
   );
-}
+};
+
+export default App;
