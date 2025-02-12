@@ -1,27 +1,34 @@
-import { ContributionCard } from '@/components/contribution/ContributionCard';
-import { getPendingContributions } from '@/lib/api/contributions';
+import { Table } from "@/components/ui/table";
 
-export default async function VerificationPage() {
-  const pendingContributions = await getPendingContributions();
+const pendingSubmissions = [ // Hardcoded data - replace with API fetch
+  { id: 1, user: "John Doe", type: "Plastic", weight: 3.2 },
+  { id: 2, user: "Jane Smith", type: "Glass", weight: 1.5 },
+];
 
+export default function VerifyPage() {
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Pending Verifications</h1>
-        <span className="badge badge-info">
-          {pendingContributions.length} pending
-        </span>
-      </div>
-      
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {pendingContributions.map(contribution => (
-          <ContributionCard 
-            key={contribution.id}
-            contribution={contribution}
-            showActions
-          />
+    <Table>
+      <Table.Header>
+        <Table.Row>
+          <Table.Head>User</Table.Head>
+          <Table.Head>Material</Table.Head>
+          <Table.Head>Weight</Table.Head>
+          <Table.Head>Actions</Table.Head>
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
+        {pendingSubmissions.map((submission) => (
+          <Table.Row key={submission.id}>
+            <Table.Cell>{submission.user}</Table.Cell>
+            <Table.Cell>{submission.type}</Table.Cell>
+            <Table.Cell>{submission.weight} kg</Table.Cell>
+            <Table.Cell>
+              <button className="mr-2">Approve</button>
+              <button>Reject</button>
+            </Table.Cell>
+          </Table.Row>
         ))}
-      </div>
-    </div>
+      </Table.Body>
+    </Table>
   );
 }
