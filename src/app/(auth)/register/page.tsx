@@ -1,4 +1,4 @@
-import AuthForm from "@/components/auth/AuthForm";
+import {AuthForm} from "@/components/auth/AuthForm";
 
 export default function RegisterPage() {
   const handleSubmit = async (values: { email: string; password: string; name: string }) => {
