@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import Web3 from 'web3';
-import GarbageNFT from '@/../build/contracts/Garbage1.json';
+import EcoNFT from '../../build/contracts/EcoNFT.json';
+import { useAuth } from '../contexts/AuthContext';
 
 interface WindowWithEthereum {
     ethereum?: any;
@@ -11,12 +12,22 @@ interface WindowWithEthereum {
 declare let window: WindowWithEthereum;
 
 const AdminDashboard: React.FC = () => {
+    const { role } = useAuth();
+
+    if (role !== 'admin') {
+        return <div>Unauthorized. Please login as admin.</div>;
+    }
+
     const [web3, setWeb3] = useState<Web3 | null>(null);
     const [contract, setContract] = useState<any>(null);
     const [account, setAccount] = useState<string>('');
     const [tokenURI, setTokenURI] = useState<string>('');
     const [studentAddress, setStudentAddress] = useState<string>('');
     const [rewardId, setRewardId] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
+    const [description, setDescription] = useState<string>('');
+    const [startTime, setStartTime] = useState<string>('');
+    const [endTime, setEndTime] = useState<string>('');
 
     useEffect(() => {
         const init = async () => {
@@ -30,9 +41,9 @@ const AdminDashboard: React.FC = () => {
                     setAccount(accounts[0]);
 
                     const networkId = await web3Instance.eth.net.getId();
-                    const deployedNetwork = GarbageNFT.networks[networkId];
+                    const deployedNetwork = EcoNFT.networks[networkId];
                     const contractInstance = new web3Instance.eth.Contract(
-                        GarbageNFT.abi,
+                        EcoNFT.abi,
                         deployedNetwork && deployedNetwork.address
                     );
                     setContract(contractInstance);
@@ -47,9 +58,16 @@ const AdminDashboard: React.FC = () => {
     const createReward = async () => {
         if (!contract) return;
         try {
-            await contract.methods.createReward(tokenURI).send({ from: account });
+            const startTimestamp = Math.floor(new Date(startTime).getTime() / 1000);
+            const endTimestamp = Math.floor(new Date(endTime).getTime() / 1000);
+
+            await contract.methods.createReward(tokenURI, title, description, startTimestamp, endTimestamp).send({ from: account });
             alert('Reward created successfully!');
             setTokenURI('');
+            setTitle('');
+            setDescription('');
+            setStartTime('');
+            setEndTime('');
         } catch (error) {
             console.error('Error creating reward:', error);
         }
@@ -71,6 +89,10 @@ const AdminDashboard: React.FC = () => {
     const handleTokenURIChange = (e: ChangeEvent<HTMLInputElement>) => setTokenURI(e.target.value);
     const handleRewardIdChange = (e: ChangeEvent<HTMLInputElement>) => setRewardId(e.target.value);
     const handleStudentAddressChange = (e: ChangeEvent<HTMLInputElement>) => setStudentAddress(e.target.value);
+    const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value);
+    const handleDescriptionChange = (e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value);
+    const handleStartTimeChange = (e: ChangeEvent<HTMLInputElement>) => setStartTime(e.target.value);
+    const handleEndTimeChange = (e: ChangeEvent<HTMLInputElement>) => setEndTime(e.target.value);
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-green-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -102,6 +124,54 @@ const AdminDashboard: React.FC = () => {
                                     placeholder="Enter token URI..."
                                     value={tokenURI}
                                     onChange={handleTokenURIChange}
+                                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200 outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Title
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Enter title..."
+                                    value={title}
+                                    onChange={handleTitleChange}
+                                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200 outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Description
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Enter description..."
+                                    value={description}
+                                    onChange={handleDescriptionChange}
+                                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200 outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Start Time
+                                </label>
+                                <input
+                                    type="datetime-local"
+                                    placeholder="Enter start time..."
+                                    value={startTime}
+                                    onChange={handleStartTimeChange}
+                                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200 outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    End Time
+                                </label>
+                                <input
+                                    type="datetime-local"
+                                    placeholder="Enter end time..."
+                                    value={endTime}
+                                    onChange={handleEndTimeChange}
                                     className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200 outline-none"
                                 />
                             </div>

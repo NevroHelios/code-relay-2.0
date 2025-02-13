@@ -19,9 +19,10 @@ const AdminDashboard: React.FC = () => {
   const [tokenURI, setTokenURI] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
+  const [startTime, setStartTime] = useState<string>(''); // datetime-local
+  const [endTime, setEndTime] = useState<string>(''); // datetime-local
   const [loading, setLoading] = useState<boolean>(false);
 
-  
   const createReward = async () => {
     if (!contract) {
       alert("Contract not loaded");
@@ -33,16 +34,22 @@ const AdminDashboard: React.FC = () => {
     }
     setLoading(true);
     try {
-      if (!tokenURI || !title || !description) {
+      if (!tokenURI || !title || !description || !startTime || !endTime) {
         throw new Error("Please fill in all fields");
       }
-      console.log("Creating reward with params:", { tokenURI, title, description, from: address });
-      const tx = await contract.call("createReward", [tokenURI, title, description]);
+      // Convert datetime-local inputs to Unix timestamps.
+      const startTimestamp = Math.floor(new Date(startTime).getTime() / 1000);
+      const endTimestamp = Math.floor(new Date(endTime).getTime() / 1000);
+
+      console.log("Creating reward with params:", { tokenURI, title, description, startTimestamp, endTimestamp, from: address });
+      const tx = await contract.call("createReward", [tokenURI, title, description, startTimestamp, endTimestamp]);
       console.log("Transaction successful:", tx);
       alert("Reward created successfully!");
       setTokenURI('');
       setTitle('');
       setDescription('');
+      setStartTime('');
+      setEndTime('');
     } catch (error: any) {
       console.error("Transaction failed:", error);
       alert(`Failed to create reward: ${error.message}`);
@@ -54,6 +61,8 @@ const AdminDashboard: React.FC = () => {
   const handleTokenURIChange = (e: ChangeEvent<HTMLInputElement>) => setTokenURI(e.target.value);
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value);
   const handleDescriptionChange = (e: ChangeEvent<HTMLInputElement>) => setDescription(e.target.value);
+  const handleStartTimeChange = (e: ChangeEvent<HTMLInputElement>) => setStartTime(e.target.value);
+  const handleEndTimeChange = (e: ChangeEvent<HTMLInputElement>) => setEndTime(e.target.value);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -109,6 +118,30 @@ const AdminDashboard: React.FC = () => {
                   placeholder="Enter reward description..."
                   value={description}
                   onChange={handleDescriptionChange}
+                  className="w-full p-2 border border-gray-300 text-black rounded-md mb-4"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Time
+                </label>
+                <input
+                  type="datetime-local"
+                  placeholder="Select start time..."
+                  value={startTime}
+                  onChange={handleStartTimeChange}
+                  className="w-full p-2 border border-gray-300 text-black rounded-md mb-4"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  End Time
+                </label>
+                <input
+                  type="datetime-local"
+                  placeholder="Select end time..."
+                  value={endTime}
+                  onChange={handleEndTimeChange}
                   className="w-full p-2 border border-gray-300 text-black rounded-md mb-4"
                 />
               </div>
