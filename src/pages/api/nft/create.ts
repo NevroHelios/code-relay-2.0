@@ -19,17 +19,30 @@ export default async function handler(
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    const nft = await NFT.create({
-      tokenId,
+    // Convert tokenId to number if it's not already
+    const nftData = {
+      tokenId: Number(tokenId),
       tokenURI,
       creator,
       title,
-      description,
-    });
+      description
+    };
 
+    // Check if NFT with this tokenId already exists
+    const existingNFT = await NFT.findOne({ tokenId: nftData.tokenId });
+    if (existingNFT) {
+      return res.status(400).json({ message: "NFT with this tokenId already exists" });
+    }
+
+    const nft = await NFT.create(nftData);
     return res.status(201).json(nft);
   } catch (error) {
     console.error('Error creating NFT:', error);
-    return res.status(500).json({ message: 'Error creating NFT', error: error instanceof Error ? error.message : 'Unknown error' });
+    return res.status(500).json({ 
+      message: 'Error creating NFT', 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    });
   }
 }
+
+// app/admin/page.tsx (partial update for createReward function)

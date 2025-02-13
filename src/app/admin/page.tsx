@@ -1,55 +1,95 @@
 'use client'
 
 import React, { useState, ChangeEvent } from 'react';
-import {
-  ThirdwebProvider,
-  useAddress,
-  useMetamask,
-  useContract,
-  useNetwork
-} from '@thirdweb-dev/react';
+import { ThirdwebProvider, useAddress, useMetamask, useContract } from '@thirdweb-dev/react';
+import { Sepolia } from '@thirdweb-dev/chains';
+import { ethers } from 'ethers';
+// Import your custom contract's ABI
+import GarbageNFTAbi from '../../../artifacts/contracts/GarbageNFT.sol/GarbageNFT.json';
 
 const AdminDashboard: React.FC = () => {
   const address = useAddress();
   const connectWithMetamask = useMetamask();
-  // Use your deployed Sepolia contract address here after deployment
   const contractAddress = "0xaA0801BfA7F39501b95D2F7A5f27Ea78Fbe1226C";
-  const { contract, isLoading } = useContract(contractAddress);
+  const { contract, isLoading } = useContract(contractAddress, GarbageNFTAbi.abi);
 
   const [tokenURI, setTokenURI] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
-  
   const createReward = async () => {
-    if (!contract) {
-      alert("Contract not loaded");
-      return;
+  if (!contract) {
+    alert("Contract not loaded");
+    return;
+  }
+  if (!address) {
+    connectWithMetamask();
+    return;
+  }
+  setLoading(true);
+  try {
+    if (!tokenURI || !title || !description) {
+      throw new Error("Please fill in all fields");
     }
-    if (!address) {
-      connectWithMetamask();
-      return;
-    }
-    setLoading(true);
-    try {
-      if (!tokenURI || !title || !description) {
-        throw new Error("Please fill in all fields");
+    
+    console.log("Creating reward with params:", { tokenURI, title, description, from: address });
+    const tx = await contract.call("createReward", [tokenURI, title, description]);
+    console.log("Transaction successful:", tx);
+    
+    // Parse the event logs to get the reward ID
+    const iface = new ethers.utils.Interface(GarbageNFTAbi.abi);
+    let rewardId: string | number | undefined;
+    
+    for (const log of tx.receipt.logs) {
+      try {
+        const parsedLog = iface.parseLog(log);
+        if (parsedLog.name === "RewardCreated") {
+          rewardId = parsedLog.args.rewardId.toNumber(); // Convert BigNumber to number
+          break;
+        }
+      } catch (error) {
+        console.log("Error parsing log:", error);
+        continue;
       }
-      console.log("Creating reward with params:", { tokenURI, title, description, from: address });
-      const tx = await contract.call("createReward", [tokenURI, title, description]);
-      console.log("Transaction successful:", tx);
-      alert("Reward created successfully!");
-      setTokenURI('');
-      setTitle('');
-      setDescription('');
-    } catch (error: any) {
-      console.error("Transaction failed:", error);
-      alert(`Failed to create reward: ${error.message}`);
-    } finally {
-      setLoading(false);
     }
-  };
+    
+    if (!rewardId && rewardId !== 0) {
+      throw new Error("Failed to retrieve rewardId from tx event logs");
+    }
+    
+    // Save the reward in MongoDB via API call
+    const response = await fetch("/api/nft/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tokenId: rewardId,
+        tokenURI,
+        creator: address,
+        title,
+        description
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to save NFT in database");
+    }
+    
+    const savedNFT = await response.json();
+    console.log("NFT saved successfully:", savedNFT);
+    
+    alert("Reward created successfully!");
+    setTokenURI('');
+    setTitle('');
+    setDescription('');
+  } catch (error: any) {
+    console.error("Transaction failed:", error);
+    alert(`Failed to create reward: ${error.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleTokenURIChange = (e: ChangeEvent<HTMLInputElement>) => setTokenURI(e.target.value);
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value);
@@ -68,7 +108,7 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-white rounded-2xl shadow-xl p-6 transform transition duration-500 hover:scale-105">
             <div className="flex items-center mb-6">
               <div className="bg-green-100 rounded-full p-3">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-600" fill="none" viewBox="0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               </div>
@@ -126,7 +166,7 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-white rounded-2xl shadow-xl p-6 transform transition duration-500 hover:scale-105">
             <div className="flex items-center mb-6">
               <div className="bg-blue-100 rounded-full p-3">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -169,7 +209,10 @@ const AdminDashboard: React.FC = () => {
 
 const App = () => {
   return (
-    <ThirdwebProvider activeChain="sepolia">
+    <ThirdwebProvider
+      activeChain={Sepolia}
+      sdkOptions={{ thirdwebApiKey: process.env.NEXT_PUBLIC_THIRDWEB_API_KEY }}
+    >
       <AdminDashboard />
     </ThirdwebProvider>
   );
