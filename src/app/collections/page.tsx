@@ -30,6 +30,8 @@ export default function Collections() {
               />
               <div className="mt-4">
                 <h2 className="text-xl font-semibold">Token #{nft.tokenId}</h2>
+                <p className="text-lg font-bold mt-2">{nft.title}</p>
+                <p className="text-gray-600 mt-2">{nft.description}</p>
                 <p className="text-gray-600 mt-2">Created by: {nft.creator}</p>
                 <p className="text-gray-600">
                   Status: {nft.claimedBy ? 'Claimed' : 'Available'}
