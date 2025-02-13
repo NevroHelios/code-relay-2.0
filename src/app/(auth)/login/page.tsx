@@ -1,4 +1,6 @@
-import AuthForm from "@/components/auth/AuthForm";
+'use client'
+
+import {AuthForm} from "@/components/auth/AuthForm";
 
 export default function LoginPage() {
   const handleSubmit = async (values: { email: string; password: string }) => {
