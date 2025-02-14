@@ -15,7 +15,7 @@ const geistSans = Geist({
 const play = Play({
   subsets: ["latin"],
   weight: ['400', '700'],
-  variable: "--font-play",
+  variable: "--font-play"
 })
 
 const geistMono = Geist_Mono({
