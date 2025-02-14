@@ -6,6 +6,32 @@ import { navbarItems, dropdownItems } from "@/utilis/navbar";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
+  useEffect(() => {
+    // Navbar container animation
+    gsap.from("nav", {
+      duration: 1,
+      y: -100,
+      opacity: 0,
+      ease: "power4.out",
+    });
+
+    gsap.from(".nav-item", {
+      duration: 1,
+      y: -50,
+      opacity: 0,
+      stagger: 0.2,
+      ease: "power3.out",
+    });
+
+    gsap.from(".logo", {
+      duration: 1,
+      scale: 0,
+      opacity: 0,
+      delay: 0.5,
+      ease: "back.out",
+    });
+  }, []);
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
