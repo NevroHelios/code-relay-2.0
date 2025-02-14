@@ -13,19 +13,19 @@ import { useActiveWallet } from "thirdweb/react";
 import { useRouter } from 'next/navigation'
 
 export default function Login() {
-    const account = useActiveAccount();
-    const wallet = useActiveWallet();
-    console.log(wallet);
-    const router = useRouter()
+  const account = useActiveAccount();
+  const wallet = useActiveWallet();
+  console.log(wallet);
+  const router = useRouter();
   
-    console.log(account)
-    const { data: balance, isLoading } = useWalletBalance({
-      client,
-      chain: sepolia,
-      address: account?.address, // Provide a default address
-    });
+  console.log(account);
+  const { data: balance, isLoading } = useWalletBalance({
+    client,
+    chain: sepolia,
+    address: account?.address, // Provide a default address
+  });
 
-    const wallets = [
+  const wallets = [
     inAppWallet({
       auth: {
         options: [
@@ -43,19 +43,28 @@ export default function Login() {
     createWallet("com.coinbase.wallet"),
   ];
 
-  
-    // if (account) {
-    //   router.push('/profile');
-    // }
+  // if (account) {
+  //   router.push('/profile');
+  // }
 
   const [loggedIn, setLoggedIn] = useState(false);
   return (
-    <div>
-      <ConnectButton client={client} wallets={wallets} />
-      <p>Wallet address: {account?.address}</p>
-      <p>
-        Wallet balance: {isLoading ? "Loading..." : `${balance?.displayValue} ${balance?.symbol}`}
-      </p>
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
+      <div className="bg-white shadow-lg rounded-lg max-w-md w-full p-8">
+        <h1 className="text-3xl font-bold text-center mb-4">Welcome to Eco2</h1>
+        <p className="text-gray-600 text-center mb-8">Login with your Metamask</p>
+        <div className="flex flex-col gap-6">
+          <ConnectButton client={client} wallets={wallets} />
+          <div className="mt-4 ">
+            <p className="text-green-700 font-semibold">
+              Wallet address: <span className="font-semibold">{account?.address}</span>
+            </p>
+            <p className="text-green-600 font-semibold">
+              Wallet balance: {isLoading ? "Loading..." : `${balance?.displayValue} ${balance?.symbol}`}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
