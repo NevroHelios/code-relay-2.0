@@ -1,34 +1,38 @@
-import QrScanner from '@/components/qr/QrScanner';
-import { submitContribution } from '@/lib/api/contributions';
+import { useState } from "react";
+import dynamic from "next/dynamic";
+
+const QrReader = dynamic(() => import("react-qr-scanner"), { ssr: false });
 
 export default function ScanQRPage() {
-  const handleScan = async (qrData: string) => {
-    try {
-      const contribution = await submitContribution({
-        qrCode: qrData,
-        location: await getGeoLocation(),
-        photo: await takePhoto()
-      });
-      // Show success feedback
-    } catch (error) {
-      // Handle errors
+  const [result, setResult] = useState<string | null>(null);
+
+  const handleScan = (data: string | null) => {
+    if (data) {
+      setResult(data);
     }
   };
 
+  const handleError = (err: any) => {
+    console.error(err);
+  };
+
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Scan Cleanup QR Code</h1>
-      <div className="bg-card rounded-xl p-4 shadow-sm">
-        <QrScanner 
+    <div className="p-6">
+      <h2 className="text-3xl font-bold mb-4">Scan QR Code</h2>
+      <div className="w-full max-w-md mx-auto">
+        <QrReader
+          delay={300}
+          onError={handleError}
           onScan={handleScan}
-          overlay={
-            <div className="absolute inset-0 border-4 border-primary rounded-xl" />
-          }
+          style={{ width: "100%" }}
         />
-        <p className="mt-4 text-muted-foreground text-center">
-          Point your camera at a cleanup location QR code
-        </p>
       </div>
+      {result && (
+        <div className="mt-4 p-4 bg-green-100 text-green-800 rounded">
+          <p>Scanned Data:</p>
+          <p>{result}</p>
+        </div>
+      )}
     </div>
   );
 }
