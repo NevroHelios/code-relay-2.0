@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google-cloud/vision": "^4.3.2",
     "@headlessui/react": "^2.2.0",
     "@hookform/resolvers": "^4.0.0",
     "@nomiclabs/hardhat-etherscan": "^3.1.8",
@@ -20,6 +21,7 @@
     "@radix-ui/react-slot": "^1.1.2",
     "@thirdweb-dev/auth": "^4.1.97",
     "@thirdweb-dev/react": "^4.9.4",
+    "@types/formidable": "^3.4.5",
     "chai": "^5.1.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
