@@ -59,7 +59,7 @@ const AdminDashboard: React.FC = () => {
     }
     
     // Save the reward in MongoDB via API call
-    const response = await fetch("/api/nft/create", {
+    const response = await fetch("/api/nft", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
