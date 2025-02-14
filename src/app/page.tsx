@@ -70,9 +70,9 @@ export default function HomePage() {
           aspernatur aliquam provident!
         </p>
         <Link href="/explore">
-          <a className="hero-btn mt-8 inline-block border-4 border-white rounded-full px-8 py-4 text-2xl text-white transition hover:bg-white hover:text-black">
+          <div className="hero-btn mt-8 inline-block border-4 border-white rounded-full px-8 py-4 text-2xl text-white transition hover:bg-white hover:text-black">
             Explore now
-          </a>
+          </div>
         </Link>
       </div>
     </section>
