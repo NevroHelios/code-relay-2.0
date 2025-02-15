@@ -1,0 +1,4 @@
+Barcode Type,Barcode Value,Description
+Code 39,12345,Lab Access (Extra Time in IIT)
+Code 128,ABCDE,Food (Cafeteria Coupons)
+Code 11,67890,Stationary (Lab Notebooks)
