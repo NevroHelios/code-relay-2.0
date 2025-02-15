@@ -86,7 +86,7 @@ const HeroLanding = () => {
 
   return (
     <div className="fixed z-[-1]">
-      <video
+      {/* <video
         playsInline
         autoPlay={true}
         loop={true}
@@ -97,7 +97,7 @@ const HeroLanding = () => {
           src="https://res.cloudinary.com/dlrlet9fg/video/upload/v1739583312/vecteezy_green-particle-wave-background-the-green-particles-glow_11386772_1_1_1_g3syxt.mp4"
           type="video/mp4"
         />
-      </video>
+      </video> */}
       
       {/* Site Logo - Added initial opacity */}
       {/* <div className="site-logo fixed left-1/2 -translate-x-1/2 text-2xl sm:text-3xl md:text-4xl lg:text-5xl 
