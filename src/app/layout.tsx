@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Play } from "next/font/google";
 import "./globals.css";
@@ -7,12 +6,6 @@ import Navbar from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Inter, Montserrat } from 'next/font/google';
 import HeroSection from '@/components/hero';
-=======
-"use client"
-import { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
-import { ThirdwebProvider } from '@thirdweb-dev/react';
->>>>>>> 63e54fb27683981893f5e12fe47f0d24b58be9b2
 
 const geist = Geist({
   variable: "--font-geist-sans",
@@ -40,7 +33,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-<<<<<<< HEAD
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet" />
       </head>
@@ -53,11 +45,6 @@ export default function RootLayout({
         <HeroSection /></div>
           {children}
           
-=======
-      <body className={`${geist.variable} ${geistMono.variable} antialiased`}>
-        <ThirdwebProvider>
-          {children}
->>>>>>> 63e54fb27683981893f5e12fe47f0d24b58be9b2
         </ThirdwebProvider>
       </body>
     </html>
