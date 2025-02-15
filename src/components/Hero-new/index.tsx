@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { TypeAnimation } from 'react-type-animation';
 import Preloader from '../Logo';
+import Link from 'next/link';
 
 const Hero = ({ heroTopRef }: { heroTopRef: (node?: Element | null | undefined) => void }) => {
   return (
@@ -58,12 +59,12 @@ const Hero = ({ heroTopRef }: { heroTopRef: (node?: Element | null | undefined) 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <button className="group relative flex h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-green-700/80 to-green-700/40 backdrop-blur-sm transition-all duration-300 hover:from-green-900 hover:to-green-600">
+              <Link href={'/admin-new'} className="group relative flex h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-green-700/80 to-green-700/40 backdrop-blur-sm transition-all duration-300 hover:from-green-900 hover:to-green-600">
                 <div className="absolute inset-0 opacity-80 transition-opacity group-hover:opacity-90" />
                 <span className="z-[9999] flex items-center font-pixelate text-white text-bold relative">
                   Login
                 </span>
-              </button>
+              </Link>
             </motion.div>
           </motion.div>
         </div>
