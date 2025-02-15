@@ -208,12 +208,12 @@ const Team: React.FC = () => {
               <span className="flex-none text-green-500 opacity-85 font-bold tracking-wider pl-4">
                 04.
               </span>
-              <span className="flex-none text-gray-200 opacity-85 font-bold tracking-wider pl-4">
-                Prizes
+              <span className="flex-none text-gray-200 opacity-85 font-bold tracking-wider pl-4 uppercase">
+                Collections
               </span>
 
               <div className="flex flex-col item-center justify-center ">
-                <div className="right-full top-[55%] transform h-[1px] w-[70vh] bg-[#1d6339] mt-[25px] ml-4"></div>
+                <div className="right-full top-[55%] transform h-[2px] w-[70vh] bg-[#1d6339] mt-[25px] ml-4"></div>
               </div>
             </h2>
           </div>

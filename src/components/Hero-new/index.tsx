@@ -36,10 +36,7 @@ const Hero = ({ heroTopRef }: { heroTopRef: (node?: Element | null | undefined) 
               }}
             >
               <span className="font-pixelate font-bold text-white text-base sm:text-lg md:text-[1.5rem]">
-                <TypeAnimation
-                  sequence={[1500, `GreenSync turns trash into tokens, tracks carbon karma, and rewards you through decentralized cleanups.`]}
-                  speed={80}
-                />
+               <span className='uppercase text-4xl text-green-400'>GreenSync</span> turns trash into tokens, tracks carbon karma, and rewards you through decentralized cleanups.
               </span>
             </motion.div>
           </div>

@@ -47,7 +47,7 @@ export default function RootLayout({
             <HeroSection />
           </div>
           {children}
-          
+          <Footer/>
         </ThirdwebProvider>
       </body>
     </html>
