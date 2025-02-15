@@ -47,7 +47,7 @@ const Page = () => {
       variants={containerVariant}
       className="min-h-screen flex items-center justify-center  font-play"
     >
-      <div className=" p-8 bg-black rounded shadow-lg w-full max-w-md">
+      <div className=" p-8 mt-14 bg-black bg-opacity-20 backdrop-blur-md rounded-lg shadow-lg w-full max-w-md">
         <motion.h1
           variants={itemVariant}
           className="text-2xl font-bold text-center text-green-600 mb-6"
@@ -66,7 +66,7 @@ const Page = () => {
         ) : (
           <form onSubmit={handleSubmit}>
             <motion.div variants={itemVariant} className="mb-6"> 
-              <label className="block text-gray-700 text-sm font-bold mb-3"> 
+              <label className="block text-green-600 text-sm font-bold mb-3"> 
                 Name
               </label>
               <input
@@ -79,7 +79,7 @@ const Page = () => {
             </motion.div>
 
             <motion.div variants={itemVariant} className="mb-6">
-              <label className="block text-gray-700 text-sm font-bold mb-3">
+              <label className="block text-green-600 text-sm font-bold mb-3">
                 Surname
               </label>
               <input
@@ -92,7 +92,7 @@ const Page = () => {
             </motion.div>
 
             <motion.div variants={itemVariant}>
-              <label className="block text-gray-700 text-sm font-bold mb-3">
+              <label className="block text-green-600 text-sm font-bold mb-3">
                 Aadhar Card
               </label>
               <div className="flex items-center space-x-4">
@@ -122,9 +122,9 @@ const Page = () => {
               variants={itemVariant}
               className="flex justify-center mt-8"
             >
-              <Link href="/admin-new-google"
+              <Link href="/login"
                 
-                className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-all transform hover:scale-105 focus:outline-none"
+                className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-md transition-all transform hover:scale-105 focus:outline-none"
               >
                 Submit
               </Link>

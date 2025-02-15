@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Hero from "@/components/Hero-new";
+import About from "@/components/about";
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -17,9 +18,12 @@ export default function HomePage() {
   return (
     <main>
       {isLoading ? (
-        <div></div>
+        <div>Loading...</div>
       ) : (
-        <Hero />
+        <>
+          <Hero />
+          <About />
+        </>
       )}
     </main>
   );

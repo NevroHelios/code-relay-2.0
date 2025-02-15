@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import { Inter, Montserrat } from 'next/font/google';
 import HeroSection from '@/components/hero';
 
-const geistSans = Geist({
+const geist = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
@@ -28,23 +28,23 @@ const montserrat = Montserrat({ subsets: ['latin'] });
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${play.variable} ${montserrat.className} antialiased`}
+        className={`${geist.variable} ${geistMono.variable} ${play.variable} ${montserrat.className} antialiased`}
       >
         <ThirdwebProvider>
-        <Navbar/>
-        <div className="z-[-1]">
-        <HeroSection /></div>
+          <Navbar/>
+          <div className="z-[-1]">
+            <HeroSection />
+          </div>
           {children}
-          
         </ThirdwebProvider>
       </body>
     </html>

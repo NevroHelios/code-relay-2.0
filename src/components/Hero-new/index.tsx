@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { TypeAnimation } from 'react-type-animation';
 import Preloader from '../Logo';
+import Link from 'next/link';
 
 const Hero = ({ heroTopRef }: { heroTopRef: (node?: Element | null | undefined) => void }) => {
   return (
@@ -44,7 +45,7 @@ const Hero = ({ heroTopRef }: { heroTopRef: (node?: Element | null | undefined) 
           </div>
 
           <motion.div 
-            className="mx-auto mt-8 flex w-full justify-center"
+            className="mx-auto mt-8 flex w-full justify-center relative z-[9999]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ 
@@ -54,16 +55,16 @@ const Hero = ({ heroTopRef }: { heroTopRef: (node?: Element | null | undefined) 
           >
             {/* Centered Discord Button */}
             <motion.div 
-              className="flex justify-center w-full max-w-xs z-[999]"
+              className="flex justify-center w-full max-w-xs relative z-[9999]"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <button className="group relative flex h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-green-700/80 to-green-700/40 backdrop-blur-sm transition-all duration-300 hover:from-green-900 hover:to-green-600">
+              <Link href={'/admin-new'} className="group relative flex h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-green-700/80 to-green-700/40 backdrop-blur-sm transition-all duration-300 hover:from-green-900 hover:to-green-600">
                 <div className="absolute inset-0 opacity-80 transition-opacity group-hover:opacity-90" />
-                <span className="z-[999] flex items-center font-pixelate text-white text-bold">
+                <span className="z-[9999] flex items-center font-pixelate text-white text-bold relative">
                   Login
                 </span>
-              </button>
+              </Link>
             </motion.div>
           </motion.div>
         </div>
