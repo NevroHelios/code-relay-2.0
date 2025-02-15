@@ -44,5 +44,3 @@ export default async function handler(
     });
   }
 }
-
-// app/admin/page.tsx (partial update for createReward function)
