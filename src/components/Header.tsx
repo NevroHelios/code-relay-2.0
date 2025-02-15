@@ -1,35 +1,76 @@
 "use client";
-
+import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import {
-  FaBell,
-  FaShareAlt,
-  FaGlobe,
-  FaBars,
-  FaDiscord,
-  FaTimes,
-} from "react-icons/fa";
-import { SiEthereum } from "react-icons/si"; // Add this import
+import { FaBell, FaShareAlt, FaGlobe, FaBars, FaDiscord, FaTimes } from "react-icons/fa";
+import { SiEthereum } from "react-icons/si";
 import { navbarItems, dropdownItems } from "@/utilis/navbar";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import Preloader from "./Logo";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useActiveAccount, useWalletBalance } from "thirdweb/react";
-import { client } from "@/app/client";
-import { sepolia } from "thirdweb/chains";
+import { useAddress, useMetamask, useDisconnect, useBalance } from "@thirdweb-dev/react";
+import { Sepolia } from "@thirdweb-dev/chains";
 
 const Navbar = () => {
   const router = useRouter();
-  const account = useActiveAccount();
-  const { data: balance, isLoading } = useWalletBalance({
-    client,
-    chain: sepolia,
-    address: account?.address || "0x0000000000000000000000000000000000000000",
-  });
+  const connectWithMetamask = useMetamask();
+  const address = useAddress();
+  const disconnect = useDisconnect();
+  const { data: balance, isLoading } = useBalance(address, Sepolia);
+
+  const [coinBalance, setCoinBalance] = useState<number>(0);
+  const [isAadhaarVerified, setIsAadhaarVerified] = useState<boolean>(false);
+
+  // Auto reconnect on page reload if wallet was previously connected
+  useEffect(() => {
+    const wasConnected = window.localStorage.getItem("isWalletConnected");
+    if (!address && wasConnected === "true") {
+      // Automatically reconnect
+      connectWithMetamask();
+    }
+  }, [address, connectWithMetamask]);
+
+  // Example login handler updates localStorage when user logs in
+  const handleLogin = async () => {
+    try {
+      await connectWithMetamask();
+      window.localStorage.setItem("isWalletConnected", "true");
+    } catch (error) {
+      console.error("Failed to connect wallet:", error);
+    }
+  };
 
   useEffect(() => {
+    const fetchCoinBalance = async () => {
+      try {
+        const response = await fetch('/api/coin-balance');
+        const data = await response.json();
+        setCoinBalance(data.balance);
+      } catch (error) {
+        console.error('Error fetching coin balance:', error);
+      }
+    };
+
+    if (address) {
+      fetchCoinBalance();
+    }
+  }, [address]);
+
+  useEffect(() => {
+    // Check Aadhaar verification status
+    const checkAadhaarVerification = async () => {
+      try {
+        const response = await fetch('/api/check-aadhaar-verification');
+        const data = await response.json();
+        setIsAadhaarVerified(data.isVerified);
+      } catch (error) {
+        console.error('Error checking Aadhaar verification status:', error);
+      }
+    };
+
+    checkAadhaarVerification();
+
     // Navbar container animation
     gsap.from("nav", {
       duration: 1,
@@ -102,7 +143,7 @@ const Navbar = () => {
   };
 
   const handleProfileClick = () => {
-    router.push("/"); // Changed from '/profile' to '/'
+    router.push('/profile');
   };
 
   return (
@@ -137,44 +178,70 @@ const Navbar = () => {
             collections
           </a>
           {/* Login Button or Profile Avatar with Balance */}
-          {account ? (
-            <div className="flex items-center gap-4 mx-8 md:mx-16">
-              <div className="flex items-center gap-2 bg-green-900/20 px-3 py-1 rounded-lg">
-                <SiEthereum className="text-green-500 text-xl" />
-                <span className="text-green-400 font-medium">
-                  {isLoading ? (
-                    <span className="animate-pulse">...</span>
-                  ) : (
-                    `${Number(balance?.displayValue).toFixed(4)}`
-                  )}
-                </span>
-              </div>
-              <motion.div
+          <div className="flex items-center">
+            {address ? (
+              <>
+                <div className="flex items-center gap-2 bg-green-900/20 px-3 py-1 rounded-lg">
+                  <SiEthereum className="text-green-500 text-xl" />
+                  <span className="text-green-400 font-medium">
+                    {isLoading ? (
+                      <span className="animate-pulse">...</span>
+                    ) : (
+                      `${Number(balance?.displayValue).toFixed(4)}`
+                    )}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 bg-green-900/20 px-3 py-1 rounded-lg">
+                  <span className="text-green-400 font-medium">
+                    Coins: {coinBalance}
+                  </span>
+                </div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleProfileClick}
+                  className="cursor-pointer"
+                >
+                  <Image
+                    src="/dummy-user.png"
+                    alt="User Avatar"
+                    width={40}
+                    height={40}
+                    className="rounded-full border-2 border-green-500"
+                  />
+                </motion.div>
+                <button
+                  onClick={() => disconnect()}
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={handleProfileClick}
-                className="cursor-pointer"
+                onClick={handleLogin}
+                className="flex items-center gap-2 bg-gradient-to-br from-green-950/40 to-green-700/40 
+                           backdrop-blur-sm px-4 py-2 rounded-xl hover:from-green-900 hover:to-green-600
+                           mx-8 md:mx-16"
               >
-                <Image
-                  src="/dummy-user.png"
-                  alt="User Avatar"
-                  width={40}
-                  height={40}
-                  className="rounded-full border-2 border-green-500"
-                />
-              </motion.div>
-            </div>
-          ) : (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 bg-gradient-to-br from-green-950/40 to-green-700/40 
-                         backdrop-blur-sm px-4 py-2 rounded-xl hover:from-green-900 hover:to-green-600
-                         mx-8 md:mx-16"
-            >
-              <span className="text-xl">Login</span>
-            </motion.button>
-          )}
+                <span className="text-xl">Login</span>
+              </motion.button>
+            )}
+            {isAadhaarVerified && !address && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleLogin}
+                className="flex items-center gap-2 bg-gradient-to-br from-green-950/40 to-green-700/40 
+                           backdrop-blur-sm px-4 py-2 rounded-xl hover:from-green-900 hover:to-green-600
+                           mx-8 md:mx-16"
+              >
+                <span className="text-xl">Connect MetaMask</span>
+              </motion.button>
+            )}
+          </div>
         </div>
 
         {/* Mobile Menu Button */}
@@ -220,7 +287,7 @@ const Navbar = () => {
               </motion.div>
 
               {/* Mobile Login Button or Profile Avatar */}
-              {account ? (
+              {address ? (
                 <>
                   <motion.div
                     variants={{
@@ -238,6 +305,16 @@ const Navbar = () => {
                         `${Number(balance?.displayValue).toFixed(4)}`
                       )}
                     </span>
+                  </motion.div>
+                  <motion.div
+                    variants={{
+                      open: { opacity: 1, y: 0 },
+                      closed: { opacity: 0, y: 20 }
+                    }}
+                    transition={{ delay: 0.4 }}
+                    className="text-2xl hover:text-green-400"
+                  >
+                    Coins: {coinBalance}
                   </motion.div>
                   <motion.a
                     variants={{
@@ -259,6 +336,12 @@ const Navbar = () => {
                       className="rounded-full border-2 border-green-500"
                     />
                   </motion.a>
+                  <button
+                    onClick={() => disconnect()}
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                  >
+                    Logout
+                  </button>
                 </>
               ) : (
                 <motion.button
@@ -269,6 +352,7 @@ const Navbar = () => {
                   transition={{ delay: 0.4 }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={handleLogin}
                   className="flex items-center gap-2 bg-gradient-to-br from-green-950/40 to-green-700/40 
                              backdrop-blur-sm px-6 py-3 rounded-xl hover:from-green-900 hover:to-green-600"
                 >
@@ -286,7 +370,7 @@ const Navbar = () => {
               >
                 contact
               </motion.div>
-            </div>
+            </div>  
           </motion.div>
         )}
       </AnimatePresence>

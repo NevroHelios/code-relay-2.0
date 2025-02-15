@@ -1,7 +1,10 @@
+"use client";
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Play } from "next/font/google";
 import "./globals.css";
-import { ThirdwebProvider } from "thirdweb/react";
+import { ThirdwebProvider } from "@thirdweb-dev/react";
+import { Sepolia } from "@thirdweb-dev/chains";
 import Navbar from "@/components/Header";
 import Footer from "@/components/footer";
 import { Inter, Montserrat } from 'next/font/google';
@@ -40,7 +43,7 @@ export default function RootLayout({
       <body
         className={`${geist.variable} ${geistMono.variable} ${play.variable} ${montserrat.className} antialiased relative`}
       >
-        <ThirdwebProvider>
+        <ThirdwebProvider activeChain={Sepolia}>
           <BackgroundVideo opacity={0.8} />
           <Navbar />
           <div>

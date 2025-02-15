@@ -26,6 +26,7 @@
     "@rooks/use-window-size": "^4.11.2",
     "@thirdweb-dev/auth": "^4.1.97",
     "@thirdweb-dev/react": "^4.9.4",
+    "@thirdweb-dev/wallets": "^2.5.39",
     "@types/bcryptjs": "^2.4.6",
     "@types/formidable": "^3.4.5",
     "@yudiel/react-qr-scanner": "^2.2.1",

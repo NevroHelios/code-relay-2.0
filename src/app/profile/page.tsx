@@ -1,25 +1,19 @@
 "use client";
 
-import { useActiveAccount, useWalletBalance } from "thirdweb/react";
-import { useActiveWallet, useDisconnect } from "thirdweb/react";
-import { client } from "@/app/client";
-import { sepolia } from "thirdweb/chains";
+import { useAddress, useDisconnect, useBalance, useWallet } from "@thirdweb-dev/react";
+import { Sepolia } from "@thirdweb-dev/chains";
 import { motion } from "framer-motion"; // Import motion for animations
 import Link from "next/link";
 import Image from "next/image"; // Import Image component for the avatar
 import { SiEthereum } from "react-icons/si"; // Add this import at the top
 
 export default function Profile() {
-  const account = useActiveAccount();
-  const wallet = useActiveWallet();
+  const address = useAddress();
+  const wallet = useWallet();
   const disconnect = useDisconnect();
-  const { data: balance, isLoading } = useWalletBalance({
-    client,
-    chain: sepolia,
-    address: account?.address || "0x0000000000000000000000000000000000000000",
-  });
+  const { data: balance, isLoading } = useBalance(address, Sepolia);
 
-  if (!account) {
+  if (!address) {
     return (
       <div className="min-h-screen flex items-center justify-center ">
         <Link href={'/login'} className="bg-white p-8 rounded-xl shadow-lg">
@@ -80,7 +74,7 @@ export default function Profile() {
               Wallet Profile
             </h1>
             <button
-              onClick={() => wallet && disconnect.disconnect(wallet)}
+              onClick={() => wallet && disconnect()}
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
             >
               Logout
@@ -93,7 +87,7 @@ export default function Profile() {
                 Wallet Address
               </p>
               <p className="text-green-200 font-mono break-all">
-                {account.address}
+                {address}
               </p>
             </div>
 
