@@ -2,3 +2,5 @@ Barcode Type,Barcode Value,Description
 Code 39,12345,Lab Access (Extra Time in IIT)
 Code 128,ABCDE,Food (Cafeteria Coupons)
 Code 11,67890,Stationary (Lab Notebooks)
+EAN-8,90162602,Energy Drink (Red Bull)
+EAN-13,8901719130014,Delicious snack biscuit (Happy Happy)
