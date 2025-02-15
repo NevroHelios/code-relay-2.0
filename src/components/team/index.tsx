@@ -1,10 +1,7 @@
-"use client"
-
-
 import { useEffect, useState } from 'react';
 import { NFT } from '../../types';
 
-export default function Collections() {
+export default function Collections2() {
   const [nfts, setNfts] = useState<NFT[]>([]);
 
   useEffect(() => {
@@ -17,12 +14,12 @@ export default function Collections() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
+    <div className="min-h-screen  py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">NFT Collections</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {nfts.map((nft) => (
-            <div key={nft.tokenId} className="bg-white rounded-lg shadow p-6">
+            <div key={nft.tokenId} className="bg-black/30 rounded-lg shadow p-6">
               <img 
                 src={nft.tokenURI} 
                 alt={`NFT ${nft.tokenId}`} 

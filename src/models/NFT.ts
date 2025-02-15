@@ -25,6 +25,11 @@ const NFTSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  expiryDate: {
+    type: Date,
+    required: true,
+    default: () => new Date(+new Date() + 7*24*60*60*1000) // Default 7 days from creation
   }
 });
 

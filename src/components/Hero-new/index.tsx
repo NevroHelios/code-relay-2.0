@@ -59,7 +59,7 @@ const Hero = ({ heroTopRef }: { heroTopRef: (node?: Element | null | undefined) 
               <Link href={'/admin-new'} className="group relative flex h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-green-700/80 to-green-700/40 backdrop-blur-sm transition-all duration-300 hover:from-green-900 hover:to-green-600">
                 <div className="absolute inset-0 opacity-80 transition-opacity group-hover:opacity-90" />
                 <span className="z-[9999] flex items-center font-pixelate text-white text-bold relative">
-                  Login
+                  Add your Aadhar
                 </span>
               </Link>
             </motion.div>
