@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { FaBell, FaShareAlt, FaGlobe, FaBars } from "react-icons/fa";
+import { FaBell, FaShareAlt, FaGlobe, FaBars, FaDiscord, FaTimes } from "react-icons/fa";
 import { navbarItems, dropdownItems } from "@/utilis/navbar";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const containerVariants = {
     hidden: { y: -100, opacity: 0 },
@@ -15,7 +16,8 @@ const Navbar = () => {
       opacity: 1,
       transition: {
         duration: 0.8,
-        staggerChildren: 0.1
+        staggerChildren: 0.1,
+        delay: 0.5 // Reduced delay to match new timing
       }
     }
   };
@@ -29,87 +31,131 @@ const Navbar = () => {
     }
   };
 
+  const mobileMenuVariants = {
+    closed: {
+      opacity: 0,
+      x: "100%",
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 40
+      }
+    },
+    open: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 40
+      }
+    }
+  };
+
   return (
-    <motion.nav
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="fixed top-0 left-0 right-0 z-[100] bg-transparent"
-    >
-      <div className="container mx-auto flex justify-between items-center p-6">
-        {/* Logo */}
-        <motion.div
-          variants={itemVariants}
-          className="text-green-500 text-3xl font-bold"
-        >
-          GreenSync
-        </motion.div>
-
-        {/* Nav Items */}
-        <div className="hidden md:flex items-center space-x-8">
-          {navbarItems.map((item, index) => (
-            <motion.a
-              key={index}
-              variants={itemVariants}
-              whileHover={{ scale: 1.1 }}
-              href={item.link}
-              className="nav-item text-green-500 hover:text-green-400 transition-colors text-lg"
-            >
-              {item.name}
-            </motion.a>
-          ))}
+    <>
+      <motion.nav
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="fixed w-full h-16 md:h-24 px-4 md:px-10 flex justify-between items-center 
+                   font-sans uppercase font-bold text-green-500 z-50 bg-black/20 backdrop-blur-sm z-[900]"
+      >
+        <div className="site-info text-sm md:text-xl">Digital / Future</div>
+        
+        {/* Desktop Menu */}
+        <div className="site-menu hidden md:flex items-center">
+          <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">projects</div>
+          <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">about</div>
           
-          {/* Icons */}
-          <motion.div
-            variants={itemVariants}
-            className="flex items-center space-x-4"
+          {/* Centered login button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 bg-gradient-to-br from-green-950/40 to-green-700/40 
+                       backdrop-blur-sm px-4 py-2 rounded-xl hover:from-green-900 hover:to-green-600
+                       mx-8 md:mx-16"
           >
-            <motion.div whileHover={{ scale: 1.2 }}>
-              <FaBell className="text-green-500 hover:text-green-400 cursor-pointer" />
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.2 }}>
-              <FaShareAlt className="text-green-500 hover:text-green-400 cursor-pointer" />
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.2 }}>
-              <FaGlobe className="text-green-500 hover:text-green-400 cursor-pointer" />
-            </motion.div>
-          </motion.div>
+            <FaDiscord className="text-xl" />
+            <span className="text-sm">Login</span>
+          </motion.button>
+
+          {/* <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">contact</div> */}
         </div>
-
-        <motion.div
-          variants={itemVariants}
-          whileHover={{ scale: 1.1 }}
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="md:hidden"
+        
+        {/* Mobile Menu Button */}
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setIsOpen(!isOpen)}
+          className="md:hidden text-2xl cursor-pointer hover:text-green-400 z-50"
         >
-          <FaBars className="text-green-500 text-2xl cursor-pointer" />
-        </motion.div>
-      </div>
+          {isOpen ? <FaTimes /> : <FaBars />}
+        </motion.button>
+      </motion.nav>
 
-      {/* Mobile Dropdown */}
+      {/* Mobile Menu Overlay */}
       <AnimatePresence>
-        {dropdownOpen && (
+        {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-full left-0 right-0 bg-white shadow-lg md:hidden"
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={mobileMenuVariants}
+            className="fixed top-0 right-0 w-full h-screen bg-black/95 backdrop-blur-md z-40 md:hidden"
           >
-            {navbarItems.map((item, index) => (
-              <motion.a
-                key={index}
-                variants={itemVariants}
-                whileHover={{ backgroundColor: "#f3f4f6" }}
-                href={item.link}
-                className="block px-6 py-3 text-gray-700"
+            <div className="flex flex-col items-center justify-center h-full gap-8 text-green-500">
+              <motion.div
+                variants={{
+                  open: { opacity: 1, y: 0 },
+                  closed: { opacity: 0, y: 20 }
+                }}
+                transition={{ delay: 0.2 }}
+                className="text-2xl hover:text-green-400"
               >
-                {item.name}
-              </motion.a>
-            ))}
+                projects
+              </motion.div>
+              <motion.div
+                variants={{
+                  open: { opacity: 1, y: 0 },
+                  closed: { opacity: 0, y: 20 }
+                }}
+                transition={{ delay: 0.3 }}
+                className="text-2xl hover:text-green-400"
+              >
+                about
+              </motion.div>
+              
+              {/* Mobile Login Button */}
+              <motion.button
+                variants={{
+                  open: { opacity: 1, y: 0 },
+                  closed: { opacity: 0, y: 20 }
+                }}
+                transition={{ delay: 0.4 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-2 bg-gradient-to-br from-green-950/40 to-green-700/40 
+                           backdrop-blur-sm px-6 py-3 rounded-xl hover:from-green-900 hover:to-green-600"
+              >
+                <FaDiscord className="text-xl" />
+                <span className="text-lg">Login</span>
+              </motion.button>
+              
+              <motion.div
+                variants={{
+                  open: { opacity: 1, y: 0 },
+                  closed: { opacity: 0, y: 20 }
+                }}
+                transition={{ delay: 0.5 }}
+                className="text-2xl hover:text-green-400"
+              >
+                contact
+              </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.nav>
+    </>
   );
 };
 

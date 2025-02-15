@@ -39,9 +39,9 @@ const Page = () => {
       initial="hidden"
       animate="visible"
       variants={containerVariant}
-      className="min-h-screen flex items-center justify-center bg-white font-play"
+      className="min-h-screen flex items-center justify-center  font-play"
     >
-      <div className="bg-white p-8 rounded shadow-lg w-full max-w-md">
+      <div className=" p-8 bg-black rounded shadow-lg w-full max-w-md">
         <motion.h1
           variants={itemVariant}
           className="text-2xl font-bold text-center text-green-600 mb-6"

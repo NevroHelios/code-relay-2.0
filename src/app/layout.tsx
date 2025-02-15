@@ -5,6 +5,7 @@ import { ThirdwebProvider } from "thirdweb/react";
 import Navbar from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Inter, Montserrat } from 'next/font/google';
+import HeroSection from '@/components/hero';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,7 +40,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${play.variable} ${montserrat.className} antialiased`}
       >
         <ThirdwebProvider>
+        <Navbar/>
+        <div className="z-[-1]">
+        <HeroSection /></div>
           {children}
+          
         </ThirdwebProvider>
       </body>
     </html>

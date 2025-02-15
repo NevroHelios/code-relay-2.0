@@ -1,11 +1,26 @@
 "use client";
 
-import HeroSection from "@/components/hero";
+import { useEffect, useState } from "react";
+import Hero from "@/components/Hero-new";
 
 export default function HomePage() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <main>
-      <HeroSection />
+      {isLoading ? (
+        <div></div>
+      ) : (
+        <Hero />
+      )}
     </main>
   );
 }
