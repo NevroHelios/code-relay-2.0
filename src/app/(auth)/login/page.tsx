@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react'
-import { createThirdwebClient } from "thirdweb"
-import { createAuth } from "thirdweb/auth"
-import { privateKeyToAccount } from "viem/accounts"
-import { client } from '@/app/client'
+import { useState, useEffect } from "react";
+import { createThirdwebClient } from "thirdweb";
+import { createAuth } from "thirdweb/auth";
+import { privateKeyToAccount } from "viem/accounts";
+import { client } from "@/app/client";
 import { ConnectButton } from "thirdweb/react";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { useActiveAccount, useWalletBalance } from "thirdweb/react";
@@ -16,7 +16,7 @@ export default function Login() {
   const account = useActiveAccount();
   const wallet = useActiveWallet();
   const router = useRouter();
-  
+
   const { data: balance, isLoading } = useWalletBalance({
     client,
     chain: sepolia,
@@ -46,7 +46,14 @@ export default function Login() {
   useEffect(() => {
     if (account) {
       setLoggedIn(true);
-      router.push('/profile');
+      if (
+        [
+          "0xa2a7866e8F4d34FAA4fbd97a6547c1f44675127f",
+          "0x3A46fb6Dc1a01B4Bdcd92439994e0b2a51f1fAA6",
+        ].includes(account.address)
+      ) {
+        router.push("/admin");
+      } else router.push("/profile");
     }
   }, [account, router]);
 
