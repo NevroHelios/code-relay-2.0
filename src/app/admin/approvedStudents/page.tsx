@@ -36,7 +36,17 @@ function ApprovedDashboard() {
   console.log(allrewards);
 
   return (
-    <div>{isPending ? <p>Loading...</p> : <div>{allrewards[6]}</div>}</div>
+    <div>
+      {/* {isPending ? (
+        <p>Loading...</p>
+      ) : (
+        <div>
+          {allrewards[4]}
+        </div>
+      )} */}
+      {allrewards ? allrewards[4] : null}
+      <div>HELLO!!!</div>
+    </div>
   );
 }
 

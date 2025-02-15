@@ -1,7 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FaBell, FaShareAlt, FaGlobe, FaBars, FaDiscord, FaTimes } from "react-icons/fa";
+import {
+  FaBell,
+  FaShareAlt,
+  FaGlobe,
+  FaBars,
+  FaDiscord,
+  FaTimes,
+} from "react-icons/fa";
 import { navbarItems, dropdownItems } from "@/utilis/navbar";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
@@ -39,24 +46,24 @@ const Navbar = () => {
 
   const containerVariants = {
     hidden: { y: -100, opacity: 0 },
-    visible: { 
-      y: 0, 
+    visible: {
+      y: 0,
       opacity: 1,
       transition: {
         duration: 0.8,
         staggerChildren: 0.1,
-        delay: 0.5 // Reduced delay to match new timing
-      }
-    }
+        delay: 0.5, // Reduced delay to match new timing
+      },
+    },
   };
 
   const itemVariants = {
     hidden: { y: -20, opacity: 0 },
-    visible: { 
-      y: 0, 
+    visible: {
+      y: 0,
       opacity: 1,
-      transition: { duration: 0.5 }
-    }
+      transition: { duration: 0.5 },
+    },
   };
 
   const mobileMenuVariants = {
@@ -66,8 +73,8 @@ const Navbar = () => {
       transition: {
         type: "spring",
         stiffness: 400,
-        damping: 40
-      }
+        damping: 40,
+      },
     },
     open: {
       opacity: 1,
@@ -75,9 +82,9 @@ const Navbar = () => {
       transition: {
         type: "spring",
         stiffness: 400,
-        damping: 40
-      }
-    }
+        damping: 40,
+      },
+    },
   };
 
   return (
@@ -87,19 +94,26 @@ const Navbar = () => {
         initial="hidden"
         animate="visible"
         className="fixed w-full h-16 md:h-24 px-4 md:px-10 flex justify-between items-center 
-                   font-sans uppercase font-bold text-green-500 z-50 z-[900]"
+                   font-sans uppercase font-bold text-green-500 z-50 bg-black/20 backdrop-blur-sm z-[900]"
       >
-        <div className="site-info w-20  text-sm md:text-xl">
-          <Preloader/>
+        <div className="flex items-center gap-4">
+          <div className="site-info w-20 text-sm md:text-xl">
+            <Preloader />
+          </div>
+          <div className="text-xl ">Green Sync</div>
         </div>
-        <a>
-        Green Sycn</a>
-        
+
         {/* Desktop Menu */}
         <div className="site-menu hidden md:flex items-center">
-          <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">projects</div>
-          <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">about</div>
-          
+          <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">
+            coins
+          </div>
+          <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">
+            about
+          </div>
+          <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">
+            collections
+          </div>
           {/* Centered login button */}
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -108,13 +122,12 @@ const Navbar = () => {
                        backdrop-blur-sm px-4 py-2 rounded-xl hover:from-green-900 hover:to-green-600
                        mx-8 md:mx-16"
           >
-           
-            <span className="text-sm">Login</span>
+            <span className="text-xl">Login</span>
           </motion.button>
 
           {/* <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">contact</div> */}
         </div>
-        
+
         {/* Mobile Menu Button */}
         <motion.button
           whileTap={{ scale: 0.9 }}
@@ -139,7 +152,7 @@ const Navbar = () => {
               <motion.div
                 variants={{
                   open: { opacity: 1, y: 0 },
-                  closed: { opacity: 0, y: 20 }
+                  closed: { opacity: 0, y: 20 },
                 }}
                 transition={{ delay: 0.2 }}
                 className="text-2xl hover:text-green-400"
@@ -149,19 +162,19 @@ const Navbar = () => {
               <motion.div
                 variants={{
                   open: { opacity: 1, y: 0 },
-                  closed: { opacity: 0, y: 20 }
+                  closed: { opacity: 0, y: 20 },
                 }}
                 transition={{ delay: 0.3 }}
                 className="text-2xl hover:text-green-400"
               >
                 about
               </motion.div>
-              
+
               {/* Mobile Login Button */}
               <motion.button
                 variants={{
                   open: { opacity: 1, y: 0 },
-                  closed: { opacity: 0, y: 20 }
+                  closed: { opacity: 0, y: 20 },
                 }}
                 transition={{ delay: 0.4 }}
                 whileHover={{ scale: 1.05 }}
@@ -169,14 +182,13 @@ const Navbar = () => {
                 className="flex items-center gap-2 bg-gradient-to-br from-green-950/40 to-green-700/40 
                            backdrop-blur-sm px-6 py-3 rounded-xl hover:from-green-900 hover:to-green-600"
               >
-                
                 <span className="text-lg">Login</span>
               </motion.button>
-              
+
               <motion.div
                 variants={{
                   open: { opacity: 1, y: 0 },
-                  closed: { opacity: 0, y: 20 }
+                  closed: { opacity: 0, y: 20 },
                 }}
                 transition={{ delay: 0.5 }}
                 className="text-2xl hover:text-green-400"
