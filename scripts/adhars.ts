@@ -1,0 +1,1 @@
+export const adhars = ["561999320901"]

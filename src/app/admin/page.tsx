@@ -3,15 +3,13 @@
 import React, { useState, ChangeEvent } from "react";
 import {
   ThirdwebProvider,
-  useActiveAccount,
-  useActiveWallet,
-  useWalletBalance,
-} from "thirdweb/react";
-import {
-  createThirdwebClient,
-  getContract,
-  prepareContractCall,
-} from "thirdweb";
+  useAddress,
+  useMetamask,
+  useContract,
+} from "@thirdweb-dev/react";
+import { Sepolia } from "@thirdweb-dev/chains";
+import { ethers } from "ethers";
+import { prepareContractCall } from "thirdweb";
 import { useSendTransaction } from "thirdweb/react";
 import { sepolia } from "thirdweb/chains";
 import { useActiveAccount } from "thirdweb/react";
@@ -32,11 +30,6 @@ const AdminDashboard: React.FC = () => {
   const [description, setDescription] = useState<string>("");
   const [expiryDate, setExpiryDate] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
-  console.log(account?.address);
-  console.log(account);
-  console.log(balance);
-  console.log("bruh");
-  const createReward = async () => {};
 
   const createReward = async () => {
     if (!address) {
@@ -61,19 +54,24 @@ const AdminDashboard: React.FC = () => {
       // Prepare reward details to be sent to MongoDB.
       // Adjust the transaction id extraction as per your data structure.
       const rewardDetails = {
-        nftAddress: contractAddress,
+        from: data.receipt.from,
         tokenURI,
-        transactionId: data?.transactionHash || data?.hash || "",
+        transactionId: data.receipt.transactionHash || "",
         title,
         description,
+        expiryDate,
       };
 
       // Post the reward details to the MongoDB endpoint.
-      await fetch("/api/rewards", {
+      const response = await fetch("/api/rewards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(rewardDetails),
       });
+      const result = await response.json();
+      if (result.success == true) {
+        console.log("NFT successfully created!!");
+      }
     } catch (error) {
       console.error("Failed to create reward:", error);
     } finally {
@@ -191,7 +189,7 @@ const AdminDashboard: React.FC = () => {
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6 text-blue-600"
                   fill="none"
-                  viewBox="0 24 24"
+                  viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
                   <path
@@ -240,7 +238,12 @@ const AdminDashboard: React.FC = () => {
 
 const App = () => {
   return (
-    <ThirdwebProvider>
+    <ThirdwebProvider
+      activeChain={Sepolia}
+      sdkOptions={{
+        thirdwebApiKey: process.env.NEXT_PUBLIC_THIRDWEB_API_KEY,
+      }}
+    >
       <AdminDashboard />
     </ThirdwebProvider>
   );

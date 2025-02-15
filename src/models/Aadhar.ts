@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { hash } from 'bcryptjs';
 
 const AadharDetailsSchema = new mongoose.Schema({
   firstName: {
@@ -16,40 +15,16 @@ const AadharDetailsSchema = new mongoose.Schema({
     minLength: [2, 'Last name must be at least 2 characters long'],
     maxLength: [50, 'Last name cannot exceed 50 characters']
   },
-  aadharNumber: {
-    type: String,
-    required: [true, 'Aadhar number is required'],
-    unique: true,
-    validate: {
-      validator: function(v: string) {
-        return /^[0-9]{12}$/.test(v);
-      },
-      message: 'Please enter a valid 12-digit Aadhar number'
-    }
-  },
-  walletAddress: {
-    type: String,
-    unique: true
-  },
-  verificationStatus: {
-    type: String,
-    enum: ['pending', 'verified', 'rejected'],
-    default: 'pending'
-  },
-  hashedAadhar: String
-}, { timestamps: true });
-
-// Pre-save middleware to hash Aadhar number
-AadharDetailsSchema.pre('save', async function(next) {
-  if (this.isModified('aadharNumber')) {
-    this.hashedAadhar = await hash(this.aadharNumber, 10);
+  // aadharNumbers : {
+  //   type : String,
+  //   enum : ['561999320901'],
+  //   required : true
+  // },
+  isVerified: {
+    type : Boolean,
+    required : true
   }
-  next();
-});
-
-// Indexes for faster queries
-AadharDetailsSchema.index({ aadharNumber: 1 });
-AadharDetailsSchema.index({ walletAddress: 1 });
+}, { timestamps: true });
 
 export const AadharDetails = mongoose.models.AadharDetails || 
   mongoose.model('AadharDetails', AadharDetailsSchema);
