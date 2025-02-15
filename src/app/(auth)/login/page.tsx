@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { createThirdwebClient } from "thirdweb";
-import { createAuth } from "thirdweb/auth";
-import { privateKeyToAccount } from "viem/accounts";
-import { client } from "@/app/client";
+import { useState, useEffect } from 'react'
+import { createThirdwebClient } from "thirdweb"
+import { createAuth } from "thirdweb/auth"
+import { privateKeyToAccount } from "viem/accounts"
+import { client } from '@/app/client'
 import { ConnectButton } from "thirdweb/react";
 import { createWallet, inAppWallet } from "thirdweb/wallets";
 import { useActiveAccount, useWalletBalance } from "thirdweb/react";
@@ -15,10 +15,8 @@ import { useRouter } from "next/navigation";
 export default function Login() {
   const account = useActiveAccount();
   const wallet = useActiveWallet();
-  console.log(wallet);
   const router = useRouter();
-
-  console.log(account);
+  
   const { data: balance, isLoading } = useWalletBalance({
     client,
     chain: sepolia,
@@ -43,11 +41,15 @@ export default function Login() {
     createWallet("com.coinbase.wallet"),
   ];
 
-  if (account) {
-    router.push('/profile');
-  }
-
   const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (account) {
+      setLoggedIn(true);
+      router.push('/profile');
+    }
+  }, [account, router]);
+
   return (
     <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="bg-white shadow-lg rounded-lg max-w-md w-full p-8">

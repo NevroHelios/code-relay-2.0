@@ -36,7 +36,7 @@ export default function RootLayout({
 
         <ThirdwebProvider>
           {" "}
-          <Navbar />
+          {/* <Navbar /> */}
           {children}
           {/* <Footer /> */}
         </ThirdwebProvider>

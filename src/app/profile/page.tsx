@@ -1,23 +1,15 @@
 "use client";
 
-import {
-  useActiveAccount,
-  useWalletBalance,
-  useDisconnect,
-} from "thirdweb/react";
-import { client } from "@/app/client";
+import { useActiveAccount, useWalletBalance } from "thirdweb/react";
+
+import { client } from '@/app/client';
 import { sepolia } from "thirdweb/chains";
-import { useActiveWallet } from "thirdweb/react";
-import styles from "./Profile.module.css";
-import { Router } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useActiveWallet, useDisconnect } from "thirdweb/react";
 
 export default function Profile() {
   const account = useActiveAccount();
   const wallet = useActiveWallet();
   const disconnect = useDisconnect();
-  const router = useRouter();
-
   const { data: balance, isLoading } = useWalletBalance({
     client,
     chain: sepolia,
@@ -25,52 +17,46 @@ export default function Profile() {
   });
 
   if (!account) {
-    router.push("/login");
     return (
-      <div className="min-h-screen flex items-center justify-center bg-green-50">
-        <div className="p-8 bg-white rounded-lg shadow-md">
-          <p className="text-lg text-gray-600">Please connect your wallet</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
+        <div className="bg-white p-8 rounded-xl shadow-lg">
+          <p className="text-green-600 text-xl font-semibold">Please connect your wallet</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-green-50 p-8">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-semibold text-green-700 mb-6">
-          Wallet Profile
-        </h2>
-
-        <div className="space-y-4">
-          <div className="bg-green-50 p-4 rounded-md">
-            <p className="text-sm text-gray-600">Wallet Address</p>
-            <p className="text-gray-800 font-medium break-all">
-              {account.address}
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 p-8">
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold text-green-800">Wallet Profile</h1>
+            <button
+              onClick={() => wallet && disconnect.disconnect(wallet)}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+            >
+              Logout
+            </button>
           </div>
+          
+          <div className="space-y-4">
+            <div className="bg-green-50 p-4 rounded-lg">
+              <p className="text-sm text-green-600 font-medium mb-1">Wallet Address</p>
+              <p className="text-gray-700 font-mono break-all">{account.address}</p>
+            </div>
 
-          <div className="bg-green-50 p-4 rounded-md">
-            <p className="text-sm text-gray-600">Balance</p>
-            <p className="text-gray-800 font-medium">
-              {isLoading ? (
-                <span className="animate-pulse">Loading...</span>
-              ) : (
-                `${balance?.displayValue} ${balance?.symbol}`
-              )}
-            </p>
+            <div className="bg-green-50 p-4 rounded-lg">
+              <p className="text-sm text-green-600 font-medium mb-1">Balance</p>
+              <p className="text-gray-700 text-xl font-semibold">
+                {isLoading ? (
+                  <span className="animate-pulse">Loading...</span>
+                ) : (
+                  `${balance?.displayValue} ${balance?.symbol}`
+                )}
+              </p>
+            </div>
           </div>
-
-          <button
-            onClick={() => {
-              if (wallet) {
-                disconnect.disconnect(wallet);
-              }
-            }}
-            className="w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
-          >
-            Disconnect Wallet
-          </button>
         </div>
       </div>
     </div>
