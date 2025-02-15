@@ -102,6 +102,28 @@ const NFTCard: React.FC<NFT> = ({ tokenId, tokenURI, creator, title, description
 
   const [imgError, setImgError] = useState(false);
 
+  const handleClaim = async () => {
+    try {
+      const response = await fetch('/api/claim', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ tokenId })
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert('NFT claimed successfully!');
+        // Update the UI or state as needed
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Error claiming NFT:', error);
+      alert('Failed to claim NFT. Please try again.');
+    }
+  };
+
   return (
     <motion.div
       className="bg-black/90 rounded-lg shadow-lg overflow-hidden"
@@ -149,6 +171,7 @@ const NFTCard: React.FC<NFT> = ({ tokenId, tokenURI, creator, title, description
           <p className="text-gray-400 text-sm mt-2">Created by: {creator}</p>
           
           <button
+            onClick={handleClaim}
             className="mt-4 w-full py-2 px-4 bg-green-700 text-white rounded-lg 
                      font-pixelate text-sm tracking-wider transform transition-all 
                      duration-300 hover:bg-green-600 hover:scale-105"

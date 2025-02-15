@@ -1,64 +1,39 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { createThirdwebClient } from "thirdweb";
-import { createAuth } from "thirdweb/auth";
-import { privateKeyToAccount } from "viem/accounts";
-import { client } from "@/app/client";
-import { ConnectButton } from "thirdweb/react";
-import { createWallet, inAppWallet } from "thirdweb/wallets";
-import { useActiveAccount, useWalletBalance } from "thirdweb/react";
-import { sepolia } from "thirdweb/chains";
-import { useActiveWallet } from "thirdweb/react";
+import { useAddress, useWallet, useDisconnect, useMetamask } from "@thirdweb-dev/react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion"; // Import motion for animations
+import Link from "next/link";
+import Image from "next/image"; // Import Image component for the avatar
 
 export default function Login() {
-  const account = useActiveAccount();
-  const wallet = useActiveWallet();
+  const address = useAddress();
+  const wallet = useWallet();
+  const disconnect = useDisconnect();
+  const connectWithMetamask = useMetamask();
   const router = useRouter();
 
-  const { data: balance, isLoading } = useWalletBalance({
-    client,
-    chain: sepolia,
-    address: account?.address,
-  });
-
-  const wallets = [
-    inAppWallet({
-      auth: {
-        options: [
-          "google",
-          "email",
-          "passkey",
-          "phone",
-          "github",
-          "facebook",
-          "apple",
-        ],
-      },
-    }),
-    createWallet("io.metamask"),
-    createWallet("com.coinbase.wallet"),
-  ];
-
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [walletConnected, setWalletConnected] = useState(false);
-
-  useEffect(() => {
-    if (account) {
-      setWalletConnected(true);
-      setLoggedIn(true);
-      if (
-        [
-          "0xa2a7866e8F4d34FAA4fbd97a6547c1f44675127f",
-          "0x3A46fb6Dc1a01B4Bdcd92439994e0b2a51f1fAA6",
-        ].includes(account.address)
-      ) {
-        router.push("/admin");
-      } else router.push("/profile");
+  const handleLogin = async () => {
+    try {
+      await connectWithMetamask();
+      window.localStorage.setItem("isWalletConnected", "true");
+      router.push('/profile');
+    } catch (error) {
+      console.error("Failed to connect wallet:", error);
     }
-  }, [account, router]);
+  };
+
+  if (address) {
+    return (
+      <div className="min-h-screen flex items-center justify-center ">
+        <Link href={'/profile'} className="bg-white p-8 rounded-xl shadow-lg">
+          <p className="text-green-600 text-xl font-semibold">
+            Wallet already connected. Go to profile.
+          </p>
+        </Link>
+      </div>
+    );
+  }
 
   const containerVariant = {
     hidden: { opacity: 0, y: -20 },
@@ -73,6 +48,8 @@ export default function Login() {
     hidden: { opacity: 0, x: -20 },
     visible: {
       opacity: 1,
+      x: 0,
+      transition: { duration: 0.4, ease: "easeOut" },
     },
   };
 
@@ -81,34 +58,30 @@ export default function Login() {
       initial="hidden"
       animate="visible"
       variants={containerVariant}
-      className="flex items-center justify-center min-h-screen"
+      className="min-h-screen p-8 flex items-center justify-center relative"
     >
-      <motion.div
-        variants={itemVariant}
-        className="p-8 mt-14 bg-black bg-opacity-20 backdrop-blur-md rounded-lg shadow-lg max-w-md w-full"
-      >
-        <h1 className="text-3xl font-bold text-green-600 text-center mb-4">
-          Welcome to GreenSync
-        </h1>
-        <p className="text-green-600 text-center mb-8">
-          Login with your Metamask
-        </p>
-        <div className="flex flex-col gap-6">
-          <ConnectButton client={client} wallets={wallets} />
-          {walletConnected && (
-            <div className="mt-4">
-              <p className="text-green-700 font-semibold">
-                Wallet address:{" "}
-                <span className="font-semibold">{account?.address}</span>
-              </p>
-              <p className="text-green-600 font-semibold">
-                Wallet balance:{" "}
-                {isLoading
-                  ? "Loading..."
-                  : `${balance?.displayValue} ${balance?.symbol}`}
-              </p>
-            </div>
-          )}
+      <motion.div variants={itemVariant} className="max-w-2xl">
+        <div className="bg-black bg-opacity-20 backdrop-blur-md rounded-lg shadow-lg p-8 space-y-6">
+          <div className="flex flex-row items-center space-x-24">
+            <Image
+              src="/dummy-user.png" // Replace with your dummy avatar image path
+              alt="User Avatar"
+              width={80}
+              height={80}
+              className="rounded-full border-2 border-green-500"
+            />
+            <h1 className="text-3xl font-bold text-green-200">
+              Login
+            </h1>
+          </div>
+          <div className="flex justify-between items-center mt-10 mb-8">
+            <button
+              onClick={handleLogin}
+              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+            >
+              Connect MetaMask
+            </button>
+          </div>
         </div>
       </motion.div>
     </motion.div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
-import GarbageNFT from '../../build/contracts/GarbageNFT.json';
+// import GarbageNFT from '../../build/contracts/GarbageNFT.json';
 
 interface Reward {
     id: number;
@@ -9,7 +9,7 @@ interface Reward {
 
 declare global {
     interface Window {
-        ethereum: any;
+        readonly ethereum?: any;
     }
 }
 

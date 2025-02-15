@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose';
 
 const RewardSchema = new mongoose.Schema({
@@ -20,7 +19,21 @@ const RewardSchema = new mongoose.Schema({
     type: Number,
     default: -1 // -1 for unlimited
   },
-  expirationDate: Date
+  expirationDate: Date,
+  claims: [{
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    date: {
+      type: Date,
+      default: Date.now
+    },
+    count: {
+      type: Number,
+      default: 0
+    }
+  }]
 }, { timestamps: true });
 
 export default mongoose.models.Reward || mongoose.model('Reward', RewardSchema);

@@ -11,6 +11,7 @@ const Page = () => {
   const [aadharCard, setAadharCard] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
