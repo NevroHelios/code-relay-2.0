@@ -37,15 +37,15 @@ function ApprovedDashboard() {
 
   return (
     <div>
-      {isPending ? (
+      {/* {isPending ? (
         <p>Loading...</p>
       ) : (
         <div>
-          {allrewards?.map((reward: any, idx: number) => {
-            <div>{reward.claimed}</div>;
-          })}
+          {allrewards[4]}
         </div>
-      )}
+      )} */}
+      {allrewards ? allrewards[4] : null}
+      <div>HELLO!!!</div>
     </div>
   );
 }

@@ -10,6 +10,7 @@
     "seed": "node --loader ts-node/esm ./scripts/seed.ts"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.11.3",
     "@ericblade/quagga2": "^1.8.4",
     "@google-cloud/vision": "^4.3.2",
     "@headlessui/react": "^2.2.0",

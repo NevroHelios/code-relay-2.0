@@ -88,16 +88,18 @@ const Navbar = () => {
         animate="visible"
         className="fixed w-full h-16 md:h-24 px-4 md:px-10 flex justify-between items-center 
                    font-sans uppercase font-bold text-green-500 z-50 bg-black/20 backdrop-blur-sm z-[900]"
-      >
-        <div className="site-info w-40 h-40 text-sm md:text-xl">
+      ><div className="flex items-center gap-4">
+        <div className="site-info w-20 text-sm md:text-xl">
           <Preloader/>
         </div>
+        <div className="text-xl ">Green Sync</div></div>
         
         {/* Desktop Menu */}
         <div className="site-menu hidden md:flex items-center">
-          <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">projects</div>
-          <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">about</div>
           
+          <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">coins</div>
+          <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">about</div>
+          <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">collections</div>
           {/* Centered login button */}
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -107,7 +109,7 @@ const Navbar = () => {
                        mx-8 md:mx-16"
           >
            
-            <span className="text-sm">Login</span>
+            <span className="text-xl">Login</span>
           </motion.button>
 
           {/* <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">contact</div> */}
