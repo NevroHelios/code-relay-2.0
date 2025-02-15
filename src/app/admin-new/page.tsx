@@ -1,212 +1,315 @@
 "use client";
 
-import React, { useState } from "react";
-import { GrUpload } from "react-icons/gr";
-import { motion } from "framer-motion";
+import React, { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { NextResponse } from "next/server";
-import axios from "axios";
-import { adhars } from "scripts/adhars";
+import { useDropzone } from "react-dropzone";
+import { FiUpload, FiFile, FiX, FiCheck, FiAlertCircle, FiCheckCircle } from "react-icons/fi";
+import { useRouter } from 'next/navigation';
+
+interface FormData {
+  name: string;
+  surname: string;
+  aadharCard: File | null;
+}
+
+const ErrorPopup: React.FC<{ message: string; onClose: () => void }> = ({ message, onClose }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 50 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: 50 }}
+    className="fixed bottom-4 right-4 bg-red-500/90 text-white px-6 py-4 rounded-lg shadow-lg backdrop-blur-sm flex items-center gap-3"
+  >
+    <FiAlertCircle className="text-2xl" />
+    <p>{message}</p>
+    <button onClick={onClose} className="ml-4 hover:text-red-200">
+      <FiX />
+    </button>
+  </motion.div>
+);
+
+const SuccessPopup: React.FC = () => (
+  <motion.div
+    initial={{ opacity: 0, y: 50 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: 50 }}
+    className="fixed bottom-4 right-4 bg-green-500/90 text-white px-6 py-4 rounded-lg shadow-lg backdrop-blur-sm flex items-center gap-3"
+  >
+    <motion.div
+      initial={{ scale: 0 }}
+      animate={{ scale: 1 }}
+      transition={{ type: "spring", stiffness: 200 }}
+    >
+      <FiCheckCircle className="text-2xl" />
+    </motion.div>
+    <p>Verification successful!</p>
+  </motion.div>
+);
 
 const Page = () => {
-  const [name, setName] = useState("");
-  const [surname, setSurname] = useState("");
-  const [aadharCard, setAadharCard] = useState<File | null>(null);
+  const router = useRouter();
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    surname: "",
+    aadharCard: null,
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [verificationStatus, setVerificationStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [dragActive, setDragActive] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
-  
-  const handleSubmit = (e: React.FormEvent) => {
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles[0]) {
+      setFormData(prev => ({
+        ...prev,
+        aadharCard: acceptedFiles[0]
+      }));
+    }
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'image/*': ['.jpeg', '.jpg', '.png'],
+      'application/pdf': ['.pdf']
+    },
+    maxSize: 5242880, // 5MB
+    multiple: false
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    verifyAdhar();
-  };
-
-  const verifyAdhar = async () => {
-    if (!aadharCard) {
-      setError("Please upload an Aadhar card.");
-      setIsSubmitting(false);
-      return;
-    }
+    setVerificationStatus('idle');
+    setShowSuccess(false);
 
     try {
-      // Convert Aadhar card image to base64
-      // const reader = new FileReader();
-      // reader.readAsDataURL(aadharCard);
-      // reader.onload = async () => {
-      //   const base64Image = reader.result as string;
+      // Simulate API call with random success/failure
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      const isVerified = Math.random() > 0.5; // Simulate random verification result
 
-      if (!aadharCard) {
-        return NextResponse.json(
-          { success: false, message: "No image file received" },
-          { status: 400 }
-        );
+      if (!isVerified) {
+        throw new Error("Verification failed. Please check your documents and try again.");
       }
 
-      const bytes = await aadharCard.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const base64 = buffer.toString("base64");
+      setVerificationStatus('success');
+      setShowSuccess(true);
+      // Redirect after 2 seconds on success
+      setTimeout(() => {
+        router.push('/login');
+      }, 2000);
 
-      const apiResponse = await axios.post(
-        "https://detect-fastapi.azurewebsites.net/aadhar",
-        {
-          image: `data:image/jpeg;base64,${base64}`,
-        }
-      );
-
-      // if (!apiResponse.ok) {
-      //   throw new Error("Failed to verify Aadhar card.");
-      // }
-
-      const { aadhar_number } = apiResponse.data as any;
-      console.log(aadhar_number);
-      if (!aadhar_number) {
-        throw new Error("Aadhar number not detected!!");
-      }
-      if (!adhars.includes(aadhar_number?.toString())) {
-        throw new Error("Not valid Aadhar!!");
-      }
-      // Search user in the database using name, surname, and Aadhar number
-      const userResponse = await fetch("/api/aadhar", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, surname, aadhar_number }),
-      });
-
-      const userData = await userResponse.json();
-      if (userData.success == true) {
-        alert("Aadhar verified and user found!!");
-      }
-      console.log("User found:", userData);
-
-      // Redirect or perform further actions
-      alert("Aadhar verified and user found!");
-      setIsSubmitting(false);
-    } catch (error: any) {
-      console.error("Error verifying Aadhar:", error);
-      setError(error.message);
+    } catch (error) {
+      setVerificationStatus('error');
+      setError(error instanceof Error ? error.message : "An unexpected error occurred");
+    } finally {
       setIsSubmitting(false);
     }
   };
 
-  const containerVariant = {
-    hidden: { opacity: 0, y: -20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" },
-    },
-  };
-
-  const itemVariant = {
-    hidden: { opacity: 0, x: -20 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.4, ease: "easeOut" },
-    },
+  const removeFile = () => {
+    setFormData(prev => ({
+      ...prev,
+      aadharCard: null
+    }));
   };
 
   return (
     <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={containerVariant}
-      className="min-h-screen flex items-center justify-center font-play"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="min-h-screen flex items-center justify-center p-4 font-play bg-gradient-to-br "
     >
-      <div className="p-8 mt-14 bg-black bg-opacity-20 backdrop-blur-md rounded-lg shadow-lg w-full max-w-md">
+      <div className="w-full max-w-md p-8 bg-black/40 backdrop-blur-xl rounded-2xl shadow-xl border border-green-500/20">
         <motion.h1
-          variants={itemVariant}
-          className="text-2xl font-bold text-center text-green-600 mb-6"
+          initial={{ y: -20 }}
+          animate={{ y: 0 }}
+          className="text-3xl font-bold text-center text-green-400 mb-8"
         >
-          USER INFORMATION
+          Verification Portal
         </motion.h1>
 
-        {isSubmitting ? (
-          <div className="flex items-center justify-center h-64">
+        <AnimatePresence mode="wait">
+          {isSubmitting ? (
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full"
-            />
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            <motion.div variants={itemVariant} className="mb-6">
-              <label className="block text-green-600 text-sm font-bold mb-3">
-                Name
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border-2 focus:border-green-500 focus:outline-none"
-                required
-              />
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center justify-center h-64 space-y-4"
+            >
+              <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+              <p className="text-green-400">Verifying your information...</p>
             </motion.div>
-
-            <motion.div variants={itemVariant} className="mb-6">
-              <label className="block text-green-600 text-sm font-bold mb-3">
-                Surname
-              </label>
-              <input
-                type="text"
-                value={surname}
-                onChange={(e) => setSurname(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border-2 focus:border-green-500 focus:outline-none"
-                required
-              />
-            </motion.div>
-
-            <motion.div variants={itemVariant}>
-              <label className="block text-green-600 text-sm font-bold mb-3">
-                Aadhar Card
-              </label>
-              <div className="flex items-center space-x-4">
-                <label
-                  htmlFor="aadharCard"
-                  className="cursor-pointer flex flex-col items-center justify-center w-32 h-32 border-2 border-green-500 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
-                >
-                  <GrUpload className="text-green-600 text-2xl mb-2" />
-                </label>
+          ) : (
+            <motion.form
+              onSubmit={handleSubmit}
+              className="space-y-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {/* Input fields */}
+              <div className="space-y-4">
                 <input
-                  type="file"
-                  id="aadharCard"
-                  onChange={(e) => setAadharCard(e.target.files?.[0] || null)}
-                  className="hidden"
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Enter your name"
+                  className={`w-full px-4 py-3 rounded-lg bg-black/20 border 
+                    ${verificationStatus === 'error' 
+                      ? 'border-red-500/50 text-red-400' 
+                      : 'border-green-500/30 text-green-400'} 
+                    placeholder-green-600/50 focus:outline-none focus:border-green-500 transition-colors`}
                   required
                 />
-                {aadharCard && (
-                  <span className="text-sm text-gray-600 truncate max-w-[200px]">
-                    {aadharCard.name}
-                  </span>
-                )}
+                <input
+                  type="text"
+                  value={formData.surname}
+                  onChange={(e) => setFormData(prev => ({ ...prev, surname: e.target.value }))}
+                  placeholder="Enter your surname"
+                  className={`w-full px-4 py-3 rounded-lg bg-black/20 border 
+                    ${verificationStatus === 'error' 
+                      ? 'border-red-500/50 text-red-400' 
+                      : 'border-green-500/30 text-green-400'} 
+                    placeholder-green-600/50 focus:outline-none focus:border-green-500 transition-colors`}
+                  required
+                />
               </div>
-            </motion.div>
 
-            {error && (
-              <motion.div
-                variants={itemVariant}
-                className="text-red-500 text-sm mt-4"
-              >
-                {error}
-              </motion.div>
-            )}
+              {/* Drag & Drop */}
+              <div className="mt-6">
+                <div
+                  {...getRootProps()}
+                  className={`border-2 border-dashed rounded-lg p-6 transition-colors ${
+                    isDragActive 
+                      ? 'border-green-500 bg-green-500/10' 
+                      : verificationStatus === 'error'
+                        ? 'border-red-500/50 bg-red-500/5'
+                        : 'border-green-500/50'
+                  }`}
+                >
+                  <input {...getInputProps()} />
+                  <div className="flex flex-col items-center space-y-4">
+                    <FiUpload className="text-3xl text-green-500" />
+                    <p className="text-center text-green-400">
+                      {isDragActive
+                        ? "Drop your files here"
+                        : "Drag & drop your Aadhar card here, or click to select"}
+                    </p>
+                    <p className="text-xs text-green-600">
+                      Supported formats: JPEG, PNG, PDF (max 5MB)
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-            <motion.div
-              variants={itemVariant}
-              className="flex justify-center mt-8"
-            >
-              <button
-                type="submit"
-                className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-md transition-all transform hover:scale-105 focus:outline-none"
-              >
-                Submit
-              </button>
-            </motion.div>
-          </form>
-        )}
+              {/* Status Indicator */}
+              {verificationStatus === 'error' && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg"
+                >
+                  <p className="text-red-400 text-sm flex items-center gap-2">
+                    <FiAlertCircle />
+                    Verification failed. Please check your information and try again.
+                  </p>
+                </motion.div>
+              )}
+
+              {/* Success Indicator */}
+              {verificationStatus === 'success' && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg"
+                >
+                  <p className="text-green-400 text-sm flex items-center gap-2">
+                    <motion.div
+                      initial={{ rotate: -180, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      transition={{ duration: 0.5, type: "spring" }}
+                    >
+                      <FiCheckCircle />
+                    </motion.div>
+                    Verification successful! Redirecting to login...
+                  </p>
+                </motion.div>
+              )}
+
+              {/* File Preview */}
+              {formData.aadharCard && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/30"
+                >
+                  <div className="flex items-center space-x-3">
+                    <FiFile className="text-green-500" />
+                    <span className="text-green-400 text-sm truncate">
+                      {formData.aadharCard.name}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeFile}
+                    className="text-red-400 hover:text-red-500"
+                  >
+                    <FiX />
+                  </button>
+                </motion.div>
+              )}
+
+              <div className="flex justify-end space-x-4 mt-8">
+                <Link
+                  href="/login"
+                  className="px-6 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
+                >
+                  Cancel
+                </Link>
+                <button
+                  type="submit"
+                  disabled={!formData.aadharCard || !formData.name || !formData.surname || isSubmitting}
+                  className={`px-6 py-2 rounded-lg transition-all flex items-center space-x-2 ${
+                    verificationStatus === 'success'
+                      ? 'bg-green-500 hover:bg-green-600'
+                      : 'bg-green-600 hover:bg-green-700'
+                  } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  <span>{verificationStatus === 'success' ? 'Verified' : 'Submit'}</span>
+                  {verificationStatus === 'success' ? (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 200 }}
+                    >
+                      <FiCheckCircle />
+                    </motion.div>
+                  ) : (
+                    <FiCheck />
+                  )}
+                </button>
+              </div>
+            </motion.form>
+          )}
+        </AnimatePresence>
       </div>
+
+      {/* Success Popup */}
+      <AnimatePresence>
+        {showSuccess && <SuccessPopup />}
+      </AnimatePresence>
+
+      {/* Error Popup */}
+      <AnimatePresence>
+        {error && (
+          <ErrorPopup 
+            message={error} 
+            onClose={() => setError(null)} 
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

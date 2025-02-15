@@ -43,14 +43,17 @@ export default function RootLayout({
       <body
         className={`${geist.variable} ${geistMono.variable} ${play.variable} ${montserrat.className} antialiased relative`}
       >
-        <ThirdwebProvider activeChain={Sepolia}>
+        <ThirdwebProvider 
+          activeChain={Sepolia}
+          clientId={process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID}
+        >
           <BackgroundVideo opacity={0.8} />
           <Navbar />
           <div>
             <HeroSection />
           </div>
           {children}
-          <Footer/>
+          
         </ThirdwebProvider>
       </body>
     </html>

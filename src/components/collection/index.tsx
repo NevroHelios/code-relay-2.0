@@ -2,7 +2,8 @@ import * as logo from "@public/logo.svg";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
-
+// import { useEffect, useState } from 'react';
+import { NFT } from '../../types';
 interface TimeLeft {
   days: number;
   hours: number;
@@ -51,8 +52,8 @@ const CountdownTimer: React.FC<{ endDate: string }> = ({ endDate }) => {
 
   if (isExpired) {
     return (
-      <div className="absolute top-2 right-2 bg-red-900/80 rounded-lg px-3 py-1 text-sm font-pixelate text-white border border-red-700">
-        Expired
+      <div className="absolute top-2 right-2 bg-red-500/20 rounded-lg px-3 py-1 text-sm font-pixelate">
+        <span className="text-red-400">●</span>
       </div>
     );
   }
@@ -79,9 +80,10 @@ interface NFT {
   title: string;
   description: string;
   claimedBy?: string;
+  expiryDate: string;
 }
 
-const NFTCard: React.FC<NFT> = ({ tokenId, tokenURI, creator, title, description, claimedBy }) => {
+const Card: React.FC<NFT> = (nft) => {
   const cardX = useMotionValue(0);
   const cardY = useMotionValue(0);
   const rotateX = useTransform(cardY, [-300, 300], [10, -10]);
@@ -100,93 +102,53 @@ const NFTCard: React.FC<NFT> = ({ tokenId, tokenURI, creator, title, description
     cardY.set(0);
   };
 
-  const [imgError, setImgError] = useState(false);
-
-  const handleClaim = async () => {
-    try {
-      const response = await fetch('/api/claim', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ tokenId })
-      });
-      const data = await response.json();
-      if (data.success) {
-        alert('NFT claimed successfully!');
-        // Update the UI or state as needed
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      console.error('Error claiming NFT:', error);
-      alert('Failed to claim NFT. Please try again.');
-    }
-  };
-
   return (
     <motion.div
-      className="bg-black/90 rounded-lg shadow-lg overflow-hidden"
-      style={{ perspective: 800 }}
+      className="relative w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] min-w-[280px] max-w-[400px]"
+      style={{ perspective: 1000 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
       <motion.div
         style={{ rotateX, rotateY }}
-        className="w-full h-full p-6 border-2 border-green-700 backdrop-blur-md"
+        className="w-full h-full overflow-hidden rounded-xl bg-transparent hover:bg-white/5 transition-all duration-300 transform-gpu border border-green-500/20"
         transition={{ velocity: 0 }}
       >
-        <CountdownTimer endDate="2024-03-31T23:59:59" />
+        <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-blue-500/10 opacity-50"></div>
         
-        <div className="relative">
-          {!imgError ? (
-            <Image 
-              src={tokenURI} 
-              alt={`NFT ${title} - Token #${tokenId} by ${creator}`}
-              width={300}
-              height={200}
-              className="w-full h-48 object-cover rounded-lg transform transition-transform duration-500 hover:scale-105"
-              onError={() => setImgError(true)}
-            />
-          ) : (
-            <div className="w-full h-48 bg-gray-800 rounded-lg flex items-center justify-center">
-              <span className="text-gray-400">Image not available</span>
-            </div>
-          )}
-          <div className="absolute -bottom-4 right-4">
-            <Image
-              src={logo.default.src}
-              alt="Code Relay Collection Logo"
-              width={48}
-              height={48}
-              className="rounded-full border-2 border-green-700"
-            />
+        {/* Add countdown timer for each card */}
+        <CountdownTimer endDate={nft.expiryDate} />
+        
+        <img 
+          src={nft.tokenURI} 
+          alt={`NFT ${nft.tokenId}`} 
+          className="w-full h-48 object-cover rounded-t-xl hover:scale-105 transition-transform duration-300"
+        />
+        <div className="p-5 backdrop-blur-md bg-black/30">
+          <h2 className="text-xl font-bold text-white/90 mb-2">Token #{nft.tokenId}</h2>
+          <p className="text-lg font-semibold text-green-400 mb-2">{nft.title}</p>
+          <p className="text-gray-300/80 text-sm mb-3">{nft.description}</p>
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-gray-400">Created by: 
+              <span className="text-green-400 ml-1">{nft.creator}</span>
+            </p>
+            <span className={`px-3 py-1 rounded-full text-xs ${
+              nft.claimedBy 
+                ? 'bg-gray-700/50 text-gray-300' 
+                : 'bg-green-900/50 text-green-400'
+            }`}>
+              {nft.claimedBy ? 'Claimed' : 'Available'}
+            </span>
           </div>
-        </div>
-
-        <div className="mt-6 text-center">
-          <h2 className="text-xl font-bold text-white font-pixelate">Token #{tokenId}</h2>
-          <h3 className="text-lg font-semibold text-green-400 mt-2">{title}</h3>
-          <p className="text-gray-300 mt-2">{description}</p>
-          <p className="text-gray-400 text-sm mt-2">Created by: {creator}</p>
-          
-          <button
-            onClick={handleClaim}
-            className="mt-4 w-full py-2 px-4 bg-green-700 text-white rounded-lg 
-                     font-pixelate text-sm tracking-wider transform transition-all 
-                     duration-300 hover:bg-green-600 hover:scale-105"
-          >
-            {claimedBy ? 'Claimed' : 'Claim NFT'}
-          </button>
         </div>
       </motion.div>
     </motion.div>
   );
 };
 
-const Collection: React.FC = () => {
+const NFTCard: React.FC<NFT> = (props) => {
   const [nfts, setNfts] = useState<NFT[]>([]);
-
+  
   useEffect(() => {
     const fetchNFTs = async () => {
       const response = await fetch('/api/nft');
@@ -197,52 +159,16 @@ const Collection: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen w-full relative">
-      <div className="mt-[96px] md:mt-[116px]">
-        <div
-          className="text-white font-pixelate text-[2rem] md:text-[3rem] font-bold"
-          
-        >
-          <div className="overflow-x-hidden w-full pt-5 sm:hidden text-xl shad relative">
-            <h2 className=" flex flex-row max-w-sm md:max-w-max mx-0  font-pixelate  text-left font-bold mb-10 pt-4 md:pt-0 uppercase md:w-max relative">
-              <span className="flex-none text-green-500 opacity-85 font-bold tracking-wider pl-1">
-                04.
-              </span>
-              <span className="flex-none text-gray-200 opacity-85 font-bold tracking-wider pl-2">
-                Prizes
-              </span>
-
-              <div className="flex flex-col item-center justify-center ">
-                <div className="right-full  transform h-[4px] w-[70vh] bg-green-500 mt-[10px] ml-4"></div>
-              </div>
-            </h2>
-          </div>
-          <div className="overflow-x-hidden w-full pt-5 sm:block hidden shad relative">
-            <h2 className=" flex flex-row max-w-sm md:max-w-max mx-0  font-pixelate  text-left font-bold mb-10 pt-4 md:pt-0 md:w-max relative">
-              <span className="flex-none text-green-500 opacity-85 font-bold tracking-wider pl-4">
-                04.
-              </span>
-              <span className="flex-none text-gray-200 opacity-85 font-bold tracking-wider pl-4 uppercase">
-                Collections
-              </span>
-
-              <div className="flex flex-col item-center justify-center ">
-                <div className="right-full top-[55%] transform h-[2px] w-[70vh] bg-[#1d6339] mt-[25px] ml-4"></div>
-              </div>
-            </h2>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {nfts.map((nft) => (
-              <NFTCard key={nft.tokenId} {...nft} />
-            ))}
-          </div>
+    <div className="w-full">
+      <div className="relative p-6">
+        <div className="flex flex-wrap justify-center gap-6">
+          {nfts.map((nft) => (
+            <Card key={nft.tokenId} {...nft} />
+          ))}
         </div>
       </div>
     </div>
   );
 };
 
-export default Collection;
+export default NFTCard;

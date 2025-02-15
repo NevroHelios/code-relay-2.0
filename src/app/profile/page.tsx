@@ -1,28 +1,49 @@
 "use client";
 
-import { useAddress, useDisconnect, useBalance, useWallet } from "@thirdweb-dev/react";
-import { sepolia } from "@thirdweb-dev/chains";
-import { motion } from "framer-motion"; // Import motion for animations
+import { useAddress, useBalance, useWallet, useMetamask, useDisconnect } from "@thirdweb-dev/react";
+import { Sepolia } from "@thirdweb-dev/chains";
+import { motion } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image"; // Import Image component for the avatar
-import { SiEthereum } from "react-icons/si"; // Add this import at the top
+import Image from "next/image";
+import { SiEthereum } from "react-icons/si";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Profile() {
   const address = useAddress();
-  const wallet = useWallet();
   const disconnect = useDisconnect();
-  const { data: balance, isLoading } = useBalance(address, sepolia);
+  const { data: balance, isLoading } = useBalance(address, Sepolia);
+  const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const connectWithMetamask = useMetamask();
+
+  const handleDisconnect = async () => {
+    try {
+      setIsLoggingOut(true);
+      
+      // Clear local storage
+      window.localStorage.removeItem("isWalletConnected");
+      
+      // Disconnect wallet
+      await disconnect();
+      
+      // Small delay to ensure everything is cleared
+      setTimeout(() => {
+        setIsLoggingOut(false);
+        // Redirect to root instead of login
+        router.push('/');
+        // Force reload to clear any remaining state
+        router.refresh();
+      }, 1000);
+
+    } catch (error) {
+      console.error("Failed to disconnect:", error);
+      setIsLoggingOut(false);
+    }
+  };
 
   if (!address) {
-    return (
-      <div className="min-h-screen flex items-center justify-center ">
-        <Link href={'/login'} className="bg-white p-8 rounded-xl shadow-lg">
-          <p className="text-green-600 text-xl font-semibold">
-            Please connect your wallet
-          </p>
-        </Link>
-      </div>
-    );
+     connectWithMetamask();
   }
 
   const containerVariant = {
@@ -50,34 +71,41 @@ export default function Profile() {
       variants={containerVariant}
       className="min-h-screen p-8 flex items-center justify-center relative"
     >
-      {/* Dummy User Avatar */}
-      
-
       <motion.div variants={itemVariant} className="max-w-2xl">
         <div className="bg-black bg-opacity-20 backdrop-blur-md rounded-lg shadow-lg p-8 space-y-6">
-        
-        <div className="flex flex-row items-center space-x-24">
-        <Image
-          src="/dummy-user.png" // Replace with your dummy avatar image path
-          alt="User Avatar"
-          width={80}
-          height={80}
-          className="rounded-full border-2 border-green-500"
-        />
-          <h1 className="text-3xl font-bold text-green-200">
+          <div className="flex flex-row items-center space-x-24">
+            <Image
+              src="/dummy-user.png"
+              alt="User Avatar"
+              width={80}
+              height={80}
+              className="rounded-full border-2 border-green-500"
+            />
+            <h1 className="text-3xl font-bold text-green-200">
               UserName
             </h1>
-        </div>
+          </div>
           <div className="flex justify-between items-center mt-10 mb-8">
-            
             <h1 className="text-3xl font-bold text-green-200">
               Wallet Profile
             </h1>
             <button
-              onClick={() => wallet && disconnect()}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+              onClick={handleDisconnect}
+              disabled={isLoggingOut}
+              className={`px-4 py-2 ${
+              isLoggingOut 
+              ? 'bg-gray-500 cursor-not-allowed' 
+              : 'bg-green-600 hover:bg-green-700'
+              } text-white rounded-lg transition-colors flex items-center gap-2`}
             >
-              Logout
+              {isLoggingOut ? (
+              <>
+              <span className="animate-spin">↻</span>
+              Disconnecting...
+              </>
+              ) : (
+              'Disconnect'
+              )}
             </button>
           </div>
 
