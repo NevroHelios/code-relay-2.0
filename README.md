@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ```
 npm install --save-dev @nomiclabs/hardhat-ethers ethers
 ```
@@ -17,3 +18,6 @@ npx hardhat test
 
 
 contribuition.tsx
+=======
+# code-relay-2.0
+>>>>>>> feaccf1 (Initial commit)
