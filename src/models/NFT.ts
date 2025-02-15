@@ -1,14 +1,13 @@
 import mongoose from 'mongoose';
 
 const NFTSchema = new mongoose.Schema({
-  tokenId: {
-    type: Number,
-    required: true,
-    unique: true
-  },
   tokenURI: {
     type: String,
     required: true
+  },
+  transactionId:{
+    type : String,
+    required : true
   },
   creator: {
     type: String,
@@ -22,10 +21,19 @@ const NFTSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-});
+  starting : {
+    type : Date,
+    required : true,
+  },
+  validity : {
+    type : Date,
+    required : true
+  },
+  isClaimed : {
+    type : Boolean,
+    required : true
+  }},
+  {timestamps : true}
+);
 
 export default mongoose.models.NFT || mongoose.model('NFT', NFTSchema);
