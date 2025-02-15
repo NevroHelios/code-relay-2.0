@@ -26,7 +26,8 @@ export async function POST(request: NextRequest, response : NextResponse) {
       title,
       description,
       starting : currentDate,
-      validity : new Date(currentDate.getTime() + (expiryDate * 24 * 60 * 60 * 1000))
+      validity : new Date(currentDate.getTime() + (expiryDate * 24 * 60 * 60 * 1000)),
+      isClaimed: false
     });
     await result.save();
     return NextResponse.json({ success : true, message: "Reward saved", id: result.transactionId }, { status: 200 });

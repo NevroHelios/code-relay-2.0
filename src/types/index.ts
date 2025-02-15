@@ -4,6 +4,7 @@ export interface NFT {
   description?: string;
   title?: string;
   isClaimed: boolean;
+  validity : Date;
 }
 
 export interface CreateNFTRequest {
