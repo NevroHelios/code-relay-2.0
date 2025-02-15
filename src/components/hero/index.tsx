@@ -86,15 +86,19 @@ const HeroLanding = () => {
 
   return (
     <div className="relative">
-        
-            <video
-        autoPlay
-        loop
-        muted
-        className="fixed top-0 left-0 w-screen h-full object-cover z-[-1]  flex items-center justify-center opacity-80"
-        src="https://res.cloudinary.com/dlrlet9fg/video/upload/v1739583312/vecteezy_green-particle-wave-background-the-green-particles-glow_11386772_1_1_1_g3syxt.mp4"
-        type="video/mp4"
-      />
+      <video
+        playsInline
+        autoPlay={true}
+        loop={true}
+        muted={true}
+        className="fixed top-0 left-0 w-screen h-full object-cover z-[-1] flex items-center justify-center opacity-80"
+      >
+        <source
+          src="https://res.cloudinary.com/dlrlet9fg/video/upload/v1739583312/vecteezy_green-particle-wave-background-the-green-particles-glow_11386772_1_1_1_g3syxt.mp4"
+          type="video/mp4"
+        />
+      </video>
+      
       {/* Site Logo - Added initial opacity */}
       {/* <div className="site-logo fixed left-1/2 -translate-x-1/2 text-2xl sm:text-3xl md:text-4xl lg:text-5xl 
            uppercase font-bold text-green-500 z-50 top-4 md:top-8
