@@ -46,6 +46,9 @@ export default function Login() {
   useEffect(() => {
     if (account) {
       setLoggedIn(true);
+      if (account.address in ["0xa2a7866e8F4d34FAA4fbd97a6547c1f44675127f"]) {
+        router.push("/admin");
+      }
       router.push('/profile');
     }
   }, [account, router]);
