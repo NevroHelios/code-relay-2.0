@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThirdwebProvider } from "thirdweb/react";
 import Navbar from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Inter, Montserrat } from 'next/font/google';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,6 +22,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const inter = Inter({ subsets: ['latin'] });
+const montserrat = Montserrat({ subsets: ['latin'] });
 
 export default function RootLayout({
   children,
@@ -29,16 +32,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet" />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${play.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${play.variable} ${montserrat.className} antialiased`}
       >
-        {/* {" "} */}
-
         <ThirdwebProvider>
-          {" "}
-          {/* <Navbar /> */}
           {children}
-          {/* <Footer /> */}
         </ThirdwebProvider>
       </body>
     </html>
