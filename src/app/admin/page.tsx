@@ -11,20 +11,21 @@ import { Sepolia } from "@thirdweb-dev/chains";
 import { ethers } from "ethers";
 import { prepareContractCall } from "thirdweb";
 import { useSendTransaction } from "thirdweb/react";
-import GarbageNFTAbi from "../../../artifacts/contracts/GarbageNFT.sol/GarbageNFT.json";
+import { sepolia } from "thirdweb/chains";
+import { useActiveAccount } from "thirdweb/react";
 
 const AdminDashboard: React.FC = () => {
-  const address = useAddress();
+  const address2 = useAddress();
   const connectWithMetamask = useMetamask();
   const { mutate: sendTransaction } = useSendTransaction();
   const contractAddress = "0x9C4c3351636086d6087e94f57E46fB71df89e27B";
   const { contract, isLoading } = useContract(
-    contractAddress,
-    GarbageNFTAbi.abi
+    contractAddress
   );
-
+  const address1 = useActiveAccount()?.address;
+  const address = address1 || address2;
   console.log("Address:", address);
-  console.log(contract)
+  console.log(contract);
 
   const [tokenURI, setTokenURI] = useState<string>("");
   const [title, setTitle] = useState<string>("");
@@ -33,6 +34,10 @@ const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const createReward = async () => {
+    if (!address) {
+      await connectWithMetamask();
+    }
+
     if (!contract) {
       alert("Contract not loaded");
       return;
@@ -40,11 +45,30 @@ const AdminDashboard: React.FC = () => {
     setLoading(true);
     try {
       // Ensure the parameters match the smart contract's createReward function signature.
-      const data = await contract.call(
-        "createReward",
-        [tokenURI, title, description, expiryDate]
-      );
+      const data = await contract.call("createReward", [
+        tokenURI,
+        title,
+        description,
+        expiryDate,
+      ]);
       console.log("Reward created:", data);
+
+      // Prepare reward details to be sent to MongoDB.
+      // Adjust the transaction id extraction as per your data structure.
+      const rewardDetails = {
+        nftAddress: contractAddress,
+        tokenURI,
+        transactionId: data?.transactionHash || data?.hash || "",
+        title,
+        description,
+      };
+
+      // Post the reward details to the MongoDB endpoint.
+      await fetch("/api/rewards", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(rewardDetails),
+      });
     } catch (error) {
       console.error("Failed to create reward:", error);
     } finally {
