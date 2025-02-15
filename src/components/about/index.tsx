@@ -17,7 +17,7 @@ const particleOptions: ParticleOptions = {
   },
   color: ({ x, y, image }) => '#89fda4',
   radius: () => Math.random() * 0.5 + 0.5,
-  mass: () => 30,
+  mass: () => 70,
   friction: () => 0.15,
   initialPosition: ({ canvasDimensions }) => {
     return new Vector(canvasDimensions.width / 2, canvasDimensions.height / 2);

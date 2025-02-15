@@ -1,11 +1,7 @@
 import * as logo from "@public/logo.svg";
-import * as position1 from "@public/logo.svg";
-import * as position2 from "@public/logo.svg";
-import * as position3 from "@public/logo.svg";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
-
 
 interface TimeLeft {
   days: number;
@@ -76,41 +72,25 @@ const CountdownTimer: React.FC<{ endDate: string }> = ({ endDate }) => {
   );
 };
 
-interface MemberComponentProps {
-  imgurl: {
-    src: string;
-    width: number;
-    height: number;
-  };
-  imgurl2: {
-    src: string;
-    width: number;
-    height: number;
-  };
-  name: string;
+interface NFT {
+  tokenId: number;
+  tokenURI: string;
+  creator: string;
+  title: string;
   description: string;
-  TotalPrize: string;
-  CashPrize: string;
-  endDate: string;
+  claimedBy?: string;
 }
 
-const MemberComponent: React.FC<MemberComponentProps> = ({
-  imgurl,
-  imgurl2,
-  name,
-  description,
-  CashPrize,
-  TotalPrize,
-  endDate,
-}) => {
+const NFTCard: React.FC<NFT> = ({ tokenId, tokenURI, creator, title, description, claimedBy }) => {
   const cardX = useMotionValue(0);
   const cardY = useMotionValue(0);
   const rotateX = useTransform(cardY, [-300, 300], [10, -10]);
   const rotateY = useTransform(cardX, [-300, 300], [-10, 10]);
 
   const handleMouseMove = (event: React.MouseEvent) => {
-    const offsetX = event.clientX - window.innerWidth / 2;
-    const offsetY = event.clientY - window.innerHeight / 2;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const offsetX = event.clientX - rect.left - rect.width / 2;
+    const offsetY = event.clientY - rect.top - rect.height / 2;
     cardX.set(offsetX);
     cardY.set(offsetY);
   };
@@ -120,60 +100,60 @@ const MemberComponent: React.FC<MemberComponentProps> = ({
     cardY.set(0);
   };
 
-  const handleClick = () => {
-    console.log(`Clicked on ${name}`);
-  };
+  const [imgError, setImgError] = useState(false);
 
   return (
     <motion.div
-      className="lg:m-4 md:m-0 relative"
-      style={{
-        perspective: 800,
-      }}
+      className="bg-black/90 rounded-lg shadow-lg overflow-hidden"
+      style={{ perspective: 800 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
       <motion.div
         style={{ rotateX, rotateY }}
-        className="w-[300px] h-[400px] rounded-xl p-6 border-2 border-green-700 bg-black backdrop-blur-md bg-opacity-20 shadow-xl"
+        className="w-full h-full p-6 border-2 border-green-700 backdrop-blur-md"
         transition={{ velocity: 0 }}
       >
-        <CountdownTimer endDate={endDate} />
-
-        <div className="relative w-full h-[180px] flex justify-center items-center mb-4 ">
-          <Image
-            src={imgurl.src}
-            alt={name}
-            width={160}
-            height={160}
-            className="rounded-xl object-cover transform transition-transform duration-500 hover:scale-110"
-          />
-          <div className="absolute -bottom-4 right-4 w-12 h-12">
+        <CountdownTimer endDate="2024-03-31T23:59:59" />
+        
+        <div className="relative">
+          {!imgError ? (
+            <Image 
+              src={tokenURI} 
+              alt={`NFT ${title} - Token #${tokenId} by ${creator}`}
+              width={300}
+              height={200}
+              className="w-full h-48 object-cover rounded-lg transform transition-transform duration-500 hover:scale-105"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <div className="w-full h-48 bg-gray-800 rounded-lg flex items-center justify-center">
+              <span className="text-gray-400">Image not available</span>
+            </div>
+          )}
+          <div className="absolute -bottom-4 right-4">
             <Image
-              src={imgurl2.src}
-              alt="logo"
+              src={logo.default.src}
+              alt="Code Relay Collection Logo"
               width={48}
               height={48}
-              className="rounded-full "
+              className="rounded-full border-2 border-green-700"
             />
           </div>
         </div>
 
-        <div className="text-center space-y-4">
-          <h3 className="text-xl font-bold text-white font-pixelate tracking-wider">
-            {name}
-          </h3>
-          <p className="text-green-300 text-lg">{description}</p>
-
+        <div className="mt-6 text-center">
+          <h2 className="text-xl font-bold text-white font-pixelate">Token #{tokenId}</h2>
+          <h3 className="text-lg font-semibold text-green-400 mt-2">{title}</h3>
+          <p className="text-gray-300 mt-2">{description}</p>
+          <p className="text-gray-400 text-sm mt-2">Created by: {creator}</p>
+          
           <button
-            onClick={handleClick}
             className="mt-4 w-full py-2 px-4 bg-green-700 text-white rounded-lg 
                      font-pixelate text-sm tracking-wider transform transition-all 
-                     duration-300 hover:bg-green-600 hover:scale-105 
-                     focus:outline-none focus:ring-2 focus:ring-green-500 
-                     focus:ring-opacity-50"
+                     duration-300 hover:bg-green-600 hover:scale-105"
           >
-            Claim Prize
+            {claimedBy ? 'Claimed' : 'Claim NFT'}
           </button>
         </div>
       </motion.div>
@@ -181,9 +161,20 @@ const MemberComponent: React.FC<MemberComponentProps> = ({
   );
 };
 
-const Team: React.FC = () => {
+const Collection: React.FC = () => {
+  const [nfts, setNfts] = useState<NFT[]>([]);
+
+  useEffect(() => {
+    const fetchNFTs = async () => {
+      const response = await fetch('/api/nft');
+      const data = await response.json();
+      setNfts(data);
+    };
+    fetchNFTs();
+  }, []);
+
   return (
-    <div id="prizes" className="min-h-screen w-full relative">
+    <div className="min-h-screen w-full relative">
       <div className="mt-[96px] md:mt-[116px]">
         <div
           className="text-white font-pixelate text-[2rem] md:text-[3rem] font-bold"
@@ -219,72 +210,11 @@ const Team: React.FC = () => {
           </div>
         </div>
 
-        <div className="max-w-[1200px] mx-auto flex flex-wrap justify-center gap-8 p-4">
-          <div className="flex-none">
-            <MemberComponent
-              imgurl={{ src: position1.default.src, width: 10, height: 10 }}
-              name="1st Prize"
-              CashPrize="Total Prize of Worth $"
-              TotalPrize="Total Prize of Worth $"
-              imgurl2={{ src: logo.default.src, width: 10, height: 10 }}
-              endDate="2024-03-31T23:59:59"
-              description="First Prize Description"
-            />
-          </div>
-          <div className="flex-none">
-            <MemberComponent
-              imgurl={{ src: position2.default.src, width: 10, height: 10 }}
-              name="2nd Prize"
-              CashPrize="Total Prize of Worth $"
-              TotalPrize="Total Prize of Worth $"
-              imgurl2={{ src: logo.default.src, width: 10, height: 10 }}
-              endDate="2024-03-31T23:59:59"
-              description="Second Prize Description"
-            />
-          </div>
-          <div className="flex-none">
-            <MemberComponent
-              imgurl={{ src: position3.default.src, width: 10, height: 10 }}
-              name="3rd Prize"
-              CashPrize="Total Prize of Worth $"
-              TotalPrize="Total Prize of Worth $"
-              imgurl2={{ src: logo.default.src, width: 10, height: 10 }}
-              endDate="2024-03-31T23:59:59"
-              description="Third Prize Description"
-            />
-          </div>
-          <div className="flex-none">
-            <MemberComponent
-              imgurl={{ src: position1.default.src, width: 10, height: 10 }}
-              name="4th Prize"
-              CashPrize="Total Prize of Worth $"
-              TotalPrize="Total Prize of Worth $"
-              imgurl2={{ src: logo.default.src, width: 10, height: 10 }}
-              endDate="2024-03-31T23:59:59"
-              description="Fourth Prize Description"
-            />
-          </div>
-          <div className="flex-none">
-            <MemberComponent
-              imgurl={{ src: position2.default.src, width: 10, height: 10 }}
-              name="5th Prize"
-              CashPrize="Total Prize of Worth $"
-              TotalPrize="Total Prize of Worth $"
-              imgurl2={{ src: logo.default.src, width: 10, height: 10 }}
-              endDate="2024-03-31T23:59:59"
-              description="Fifth Prize Description"
-            />
-          </div>
-          <div className="flex-none">
-            <MemberComponent
-              imgurl={{ src: position3.default.src, width: 10, height: 10 }}
-              name="6th Prize"
-              CashPrize="Total Prize of Worth $"
-              TotalPrize="Total Prize of Worth $"
-              imgurl2={{ src: logo.default.src, width: 10, height: 10 }}
-              endDate="2024-03-31T23:59:59"
-              description="Sixth Prize Description"
-            />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {nfts.map((nft) => (
+              <NFTCard key={nft.tokenId} {...nft} />
+            ))}
           </div>
         </div>
       </div>
@@ -292,4 +222,4 @@ const Team: React.FC = () => {
   );
 };
 
-export default Team;
+export default Collection;
