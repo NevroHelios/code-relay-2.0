@@ -7,7 +7,7 @@ export async function GET(request: NextRequest, response : NextResponse) {
     await dbConnect();
 
     const allnfts = await NFT.find({});
-    return NextResponse.json({success:true, message : "NFTs fetched successfully"}, {status : 200});
+    return NextResponse.json({success:true, message : "NFTs fetched successfully", nfts : allnfts}, {status : 200});
   } catch(err){
     return NextResponse.json({success : false, message : "Internal Server error"},{status : 500})
   }
