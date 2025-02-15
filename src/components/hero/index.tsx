@@ -85,7 +85,7 @@ const HeroLanding = () => {
   }, []);
 
   return (
-    <div className="relative">
+    <div className="fixed z-[-1]">
       <video
         playsInline
         autoPlay={true}

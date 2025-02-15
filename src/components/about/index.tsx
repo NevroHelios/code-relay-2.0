@@ -1,0 +1,173 @@
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { useGlitch } from 'react-powerglitch';
+import useWindowSize from '@rooks/use-window-size';
+import ParticleImage, {
+  ParticleOptions,
+  Vector,
+  forces,
+  ParticleForce,
+} from 'react-particle-image';
+import logo from '../../../public/logo.svg';
+
+const particleOptions: ParticleOptions = {
+  filter: ({ x, y, image }) => {
+    const pixel = image.get(x, y);
+    return pixel.b > 50;
+  },
+  color: ({ x, y, image }) => '#fff',
+  radius: () => Math.random() * 0.5 + 0.5,
+  mass: () => 40,
+  friction: () => 0.15,
+  initialPosition: ({ canvasDimensions }) => {
+    return new Vector(canvasDimensions.width / 2, canvasDimensions.height / 2);
+  },
+};
+
+const motionForce = (x: number, y: number): ParticleForce => {
+  return forces.disturbance(x, y, 5);
+};
+
+const About = () => {
+  const { innerWidth } = useWindowSize();
+  const glitch = useGlitch({
+    playMode: 'always',
+    createContainers: true,
+    hideOverflow: false,
+    timing: {
+      duration: 3850,
+    },
+    glitchTimeSpan: {
+      start: 0.5,
+      end: 0.7,
+    },
+    shake: {
+      velocity: 10,
+      amplitudeX: 0.04,
+      amplitudeY: 0.04,
+    },
+    slice: {
+      count: 6,
+      velocity: 15,
+      minHeight: 0.02,
+      maxHeight: 0.15,
+      hueRotate: true,
+    },
+    pulse: false,
+  });
+
+  const fadeInUp = {
+    initial: { y: 30, opacity: 0 },
+    animate: { y: 0, opacity: 1 },
+    transition: { duration: 0.5 }
+  };
+
+  return (
+    <motion.div 
+      id="about"
+      initial="initial"
+      whileInView="animate"
+      viewport={{ once: true }}
+    >
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mt-16 md:mt-24 lg:mt-32">
+          <motion.div 
+            variants={fadeInUp}
+            className="my-2 mb-8"
+          >
+            <div className="shad relative w-full overflow-x-hidden pt-5 text-xl sm:hidden">
+              <h2 className="relative mx-0 mb-10 flex max-w-sm flex-row pt-4 text-left font-pixelate font-bold uppercase md:w-max md:max-w-max md:pt-0">
+                <span className="flex-none pl-1 font-bold tracking-wider text-green-500 opacity-85">
+                  01.
+                </span>
+                <span className="flex-none pl-2 font-bold tracking-wider text-gray-200 opacity-85">
+                  About Binary
+                </span>
+
+                <div className="item-center flex flex-col justify-center">
+                  <div className="right-full ml-4 mt-[10px] h-[4px] w-[70vh] transform bg-green-500"></div>
+                </div>
+              </h2>
+            </div>
+            <div className="shad relative hidden w-full overflow-x-hidden pt-5 sm:block">
+              <h2 className="relative mx-0 mb-10 flex max-w-sm flex-row pt-4 text-left font-pixelate font-bold uppercase md:w-max md:max-w-max md:pt-0">
+                <span className="flex-none pl-4 font-bold tracking-wider text-green-500 opacity-85">
+                  01.
+                </span>
+                <span className="flex-none pl-4 font-bold tracking-wider text-gray-200 opacity-85">
+                  About Binary
+                </span>
+
+                <div className="item-center flex flex-col justify-center">
+                  <div className="top-[50%] ml-4 mt-[25px] h-[1px] w-[70vh] transform bg-[#1d6339]"></div>
+                </div>
+              </h2>
+            </div>
+          </motion.div>
+
+          <div className="grid w-full grid-cols-1 gap-8 md:gap-16 lg:grid-cols-12">
+            <motion.div 
+              variants={fadeInUp}
+              className="order-2 lg:order-1 lg:col-span-7"
+            >
+              <h2 className="mb-4 font-pixelate text-xl md:text-2xl font-bold uppercase text-green-400">
+                hi everyone
+              </h2>
+              <motion.p 
+                variants={fadeInUp}
+                className="font-pixelate font-bold text-white text-base md:text-lg"
+              >
+                Binary is the annual hackathon of Kalyani Government Engineering College. It aims to
+                be a stage for college students to showcase their creativity and resolve societal
+                issues using technology. We hope to employ the current generation of innovators to
+                think out of the box and bring transformative solutions to the forefront.
+              </motion.p>
+              <motion.p 
+                variants={fadeInUp}
+                className="my-5 mb-4 font-pixelate font-bold text-green-400 text-base md:text-lg"
+              >
+                We intend to host about 300 students with expertise in diverse domains of computer
+                science. The BINARY will take place in the first half of March at the Kalyani
+                Government Engineering College.
+              </motion.p>
+            </motion.div>
+
+            <motion.div 
+              variants={fadeInUp}
+              className="order-1 lg:order-2 lg:col-span-5 flex items-center justify-center"
+            >
+              <div className="w-full max-w-md">
+                {innerWidth > 1024 ? (
+                  <ParticleImage
+                    src={logo.src}
+                    width={innerWidth > 1536 ? 300 : 250}
+                    entropy={20}
+                    maxParticles={innerWidth > 1536 ? 4000 : 3000}
+                    particleOptions={particleOptions}
+                    mouseMoveForce={motionForce}
+                    touchMoveForce={motionForce}
+                    backgroundColor="transparent"
+                    className="w-full"
+                  />
+                ) : (
+                  <span ref={glitch.ref}>
+                    <Image
+                      src={logo}
+                      alt="Binary Hackathon"
+                      width={innerWidth > 768 ? 300 : 200}
+                      height={innerWidth > 768 ? 300 : 200}
+                      className="w-auto h-auto"
+                      priority
+                    />
+                  </span>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </main>
+    </motion.div>
+  );
+};
+
+export default About;
