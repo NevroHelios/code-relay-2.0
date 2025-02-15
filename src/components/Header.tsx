@@ -5,6 +5,7 @@ import { FaBell, FaShareAlt, FaGlobe, FaBars, FaDiscord, FaTimes } from "react-i
 import { navbarItems, dropdownItems } from "@/utilis/navbar";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
+import Preloader from "./Logo";
 
 const Navbar = () => {
   useEffect(() => {
@@ -88,7 +89,9 @@ const Navbar = () => {
         className="fixed w-full h-16 md:h-24 px-4 md:px-10 flex justify-between items-center 
                    font-sans uppercase font-bold text-green-500 z-50 bg-black/20 backdrop-blur-sm z-[900]"
       >
-        <div className="site-info text-sm md:text-xl">Digital / Future</div>
+        <div className="site-info w-40 h-40 text-sm md:text-xl">
+          <Preloader/>
+        </div>
         
         {/* Desktop Menu */}
         <div className="site-menu hidden md:flex items-center">
@@ -103,7 +106,7 @@ const Navbar = () => {
                        backdrop-blur-sm px-4 py-2 rounded-xl hover:from-green-900 hover:to-green-600
                        mx-8 md:mx-16"
           >
-            <FaDiscord className="text-xl" />
+           
             <span className="text-sm">Login</span>
           </motion.button>
 
@@ -164,7 +167,7 @@ const Navbar = () => {
                 className="flex items-center gap-2 bg-gradient-to-br from-green-950/40 to-green-700/40 
                            backdrop-blur-sm px-6 py-3 rounded-xl hover:from-green-900 hover:to-green-600"
               >
-                <FaDiscord className="text-xl" />
+                
                 <span className="text-lg">Login</span>
               </motion.button>
               

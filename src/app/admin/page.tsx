@@ -3,23 +3,28 @@
 import React, { useState, ChangeEvent } from "react";
 import { ThirdwebProvider, useAddress, useContract } from "@thirdweb-dev/react";
 import { createThirdwebClient, getContract, resolveMethod } from "thirdweb";
-import { defineChain, sepolia } from "thirdweb/chains";
-import { useActiveAccount, useActiveWallet, useWalletBalance } from "thirdweb/react";
+import {
+  useActiveAccount,
+  useActiveWallet,
+  useWalletBalance,
+} from "thirdweb/react";
 import { prepareContractCall } from "thirdweb";
 import { useSendTransaction } from "thirdweb/react";
 import { useRouter } from "next/navigation";
-import {client} from '@/app/client';
+// import {client} from '@/app/client';
+import { sepolia } from "thirdweb/chains";
 
 // create the client with your clientId, or secretKey if in a server environment
-// const client = createThirdwebClient({
-//   clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID!,
-// });
+const client = createThirdwebClient({
+  clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID!,
+});
+console.log(client);
 
 // connect to your contract
 export const contract = getContract({
   client,
   chain: sepolia,
-  address: "0xC64e09FC48F137515598D77398aa38FA02eFDa2b",
+  address: "0x43f687CA6877a51236f64006c6A1df5DAEcB4B31",
 });
 
 const AdminDashboard: React.FC = () => {
@@ -31,10 +36,10 @@ const AdminDashboard: React.FC = () => {
   console.log(account?.address);
 
   const { data: balance, isLoading } = useWalletBalance({
-      client,
-      chain: sepolia,
-      address: account?.address || "0x0000000000000000000000000000000000000000",
-    });
+    client,
+    chain: sepolia,
+    address: account?.address || "0x0000000000000000000000000000000000000000",
+  });
 
     if (!account) {
       return (
@@ -121,7 +126,7 @@ const AdminDashboard: React.FC = () => {
           BigInt(rewardPoints),
         ],
       });
-      sendTransaction(transaction);
+      await sendTransaction(transaction);
 
       console.log("Approval successful:", transaction);
       alert("Student approved successfully!");
