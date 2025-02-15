@@ -26,6 +26,8 @@
     "@thirdweb-dev/react": "^4.9.4",
     "@types/bcryptjs": "^2.4.6",
     "@types/formidable": "^3.4.5",
+    "@yudiel/react-qr-scanner": "^2.2.1",
+    "@zxing/browser": "^0.1.5",
     "bcryptjs": "^3.0.0",
     "chai": "^5.1.2",
     "class-variance-authority": "^0.7.1",
