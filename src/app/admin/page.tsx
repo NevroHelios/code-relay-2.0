@@ -27,12 +27,33 @@ const AdminDashboard: React.FC = () => {
   const wallet = useActiveWallet();
   const router = useRouter();
 
+  console.log(wallet);
+  console.log(account?.address);
+
   const { data: balance, isLoading } = useWalletBalance({
       client,
       chain: sepolia,
       address: account?.address || "0x0000000000000000000000000000000000000000",
     });
 
+    if (!account) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
+          <div className="bg-white p-8 rounded-xl shadow-lg">
+            <p className="text-green-600 text-xl font-semibold">
+              Please connect your wallet first
+            </p>
+            <button
+              onClick={() => router.push("/login")}
+              className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+            >
+              Go to Login
+            </button>
+          </div>
+        </div>
+      );
+    }
+  
   const { mutate: sendTransaction } = useSendTransaction();
 
   // Create Reward States
@@ -49,7 +70,9 @@ const AdminDashboard: React.FC = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
   console.log(account?.address);
-
+  console.log(account)
+  console.log(balance);
+  console.log("bruh")
   const createReward = async () => {};
 
   const approveStudent = async () => {
