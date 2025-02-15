@@ -9,18 +9,26 @@ import gsap from "gsap";
 import Preloader from "./Logo";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useAddress, useMetamask, useDisconnect, useBalance } from "@thirdweb-dev/react";
+import { useAddress, useMetamask, useDisconnect, useBalance, useContract } from "@thirdweb-dev/react";
 import { Sepolia } from "@thirdweb-dev/chains";
+import { ThirdwebProvider, useActiveAccount } from "thirdweb/react";
+import { admins } from "scripts/admins";
 
 const Navbar = () => {
   const router = useRouter();
+  const address2 = useAddress();
   const connectWithMetamask = useMetamask();
-  const address = useAddress();
-  const disconnect = useDisconnect();
-  const { data: balance, isLoading } = useBalance(address, Sepolia);
+  const contractAddress = "0x9C4c3351636086d6087e94f57E46fB71df89e27B";
+  const { contract, isLoading } = useContract(contractAddress);
+  const address1 = useActiveAccount()?.address;
+  const address = address1 || address2;
+  console.log("Address:", address);
+  console.log(contract);
+  const { data: balance, isLoading : loading } = useBalance(address, Sepolia);
 
   const [coinBalance, setCoinBalance] = useState<number>(0);
   const [isAadhaarVerified, setIsAadhaarVerified] = useState<boolean>(false);
+  const [username, setusername] = useState<string>("");
 
   // Auto reconnect on page reload if wallet was previously connected
   useEffect(() => {
@@ -42,18 +50,33 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const fetchCoinBalance = async () => {
+    const fetchCoinBalance = async (address) => {
       try {
-        const response = await fetch('/api/coin-balance');
+        console.log(address);
+        const body = {
+          walletAddress: address
+        }
+        const response = await fetch('/api/userfind', {
+          method: 'POST',
+          headers: {
+            'Content-Type' : 'application.json'
+          },
+          body : JSON.stringify(body)
+        });
         const data = await response.json();
-        setCoinBalance(data.balance);
+        console.log(data);
+        if(data.success == true){
+          setCoinBalance(data.user.totalPoints);
+          setusername(data.user.name);
+        }
+        
       } catch (error) {
         console.error('Error fetching coin balance:', error);
       }
     };
 
     if (address) {
-      fetchCoinBalance();
+      fetchCoinBalance(address);
     }
   }, [address]);
 
@@ -306,16 +329,29 @@ const Navbar = () => {
                       )}
                     </span>
                   </motion.div>
-                  <motion.div
-                    variants={{
-                      open: { opacity: 1, y: 0 },
-                      closed: { opacity: 0, y: 20 }
-                    }}
-                    transition={{ delay: 0.4 }}
-                    className="text-2xl hover:text-green-400"
-                  >
-                    Coins: {coinBalance}
-                  </motion.div>
+                  {admins.includes(address) ? (
+                    <motion.div
+                      variants={{
+                        open: { opacity: 1, y: 0 },
+                        closed: { opacity: 0, y: 20 },
+                      }}
+                      transition={{ delay: 0.4 }}
+                      className="text-2xl hover:text-green-400"
+                    >
+                      Balance : {balance?.displayValue} {balance?.symbol}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      variants={{
+                        open: { opacity: 1, y: 0 },
+                        closed: { opacity: 0, y: 20 },
+                      }}
+                      transition={{ delay: 0.4 }}
+                      className="text-2xl hover:text-green-400"
+                    >
+                      Coins: {coinBalance}
+                    </motion.div>
+                  )}
                   <motion.a
                     variants={{
                       open: { opacity: 1, y: 0 },
@@ -330,7 +366,7 @@ const Navbar = () => {
                   >
                     <Image
                       src="/dummy-user.png"
-                      alt="User Avatar"
+                      alt={username}
                       width={50}
                       height={50}
                       className="rounded-full border-2 border-green-500"
@@ -370,7 +406,7 @@ const Navbar = () => {
               >
                 contact
               </motion.div>
-            </div>  
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -378,4 +414,12 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default function Finalnavbar(){
+  return(
+    <ThirdwebProvider>
+      <Navbar/>
+    </ThirdwebProvider>
+  )
+}
+
+

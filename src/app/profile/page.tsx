@@ -1,7 +1,7 @@
 "use client";
 
 import { useAddress, useDisconnect, useBalance, useWallet } from "@thirdweb-dev/react";
-import { Sepolia } from "@thirdweb-dev/chains";
+import { sepolia } from "@thirdweb-dev/chains";
 import { motion } from "framer-motion"; // Import motion for animations
 import Link from "next/link";
 import Image from "next/image"; // Import Image component for the avatar
@@ -11,7 +11,7 @@ export default function Profile() {
   const address = useAddress();
   const wallet = useWallet();
   const disconnect = useDisconnect();
-  const { data: balance, isLoading } = useBalance(address, Sepolia);
+  const { data: balance, isLoading } = useBalance(address, sepolia);
 
   if (!address) {
     return (

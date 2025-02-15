@@ -10,31 +10,28 @@ const UserSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true
+    default : "user@gmail.com"
   },
   name: {
     type: String,
-    required: true
+    required: true,
+    default : "anonymous"
   },
   totalPoints: {
     type: Number,
     default: 0
   },
-  verifiedContributions: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Contribution'
-  }],
-  ownedNFTs: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'NFT'
-  }],
+  verifiedContributions:{
+    type : [String]
+  },
+  // ownedNFTs: [{
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'NFT'
+  // }],
   lastActivity: {
     type: Date,
     default: Date.now
   }
 }, { timestamps: true });
-
-UserSchema.index({ walletAddress: 1 });
-UserSchema.index({ totalPoints: -1 });
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);
