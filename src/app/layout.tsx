@@ -37,14 +37,14 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${play.variable} ${montserrat.className} antialiased`}
+        className={`${geist.variable} ${geistMono.variable} ${play.variable} ${montserrat.className} antialiased`}
       >
         <ThirdwebProvider>
-        <Navbar/>
-        <div className="z-[-1]">
-        <HeroSection /></div>
+          <Navbar/>
+          <div className="z-[-1]">
+            <HeroSection />
+          </div>
           {children}
-          
         </ThirdwebProvider>
       </body>
     </html>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaBell, FaShareAlt, FaGlobe, FaBars, FaDiscord, FaTimes } from "react-icons/fa";
 import { navbarItems, dropdownItems } from "@/utilis/navbar";
 import { motion, AnimatePresence } from "framer-motion";
