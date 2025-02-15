@@ -35,37 +35,54 @@ export default function GarbageUpload() {
     if (!file) return;
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append("image", file);
-
     try {
-      const response = await fetch("/api/vision/verify", {
-        method: "POST",
-        body: formData,
+      const base64String = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          if (typeof reader.result === "string") {
+            // Get everything after the comma to remove data:image/jpeg;base64,
+            const base64 = reader.result.split(",")[1];
+            resolve(base64);
+          } else {
+            reject(new Error("Failed to read file as base64"));
+          }
+        };
+        reader.onerror = reject;
       });
 
-      // Check if the response status is OK
+      console.log("Sending request to backend...");
+      const requestBody = {
+        image: base64String,
+      };
+      console.log("Request body structure:", JSON.stringify(requestBody));
+
+      const response = await fetch(
+        "https://detect-fastapi.azurewebsites.net/detect",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
       if (!response.ok) {
-        const text = await response.text();
-        console.error("Server responded with error:", response.status, text);
-        throw new Error(`Server Error: ${response.status}`);
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
+        throw new Error(errorText);
       }
 
       const data = await response.json();
-
-      if (data.success) {
-        setResult("success");
-      } else {
-        setResult("fail");
-      }
+      setResult(data.plastic_garbage === "YES" ? "success" : "fail");
     } catch (error) {
-      console.error("Error calling Google Vision API", error);
+      console.error("Upload error:", error);
       setResult("fail");
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center  p-6">
       <h1 className="text-3xl font-bold mb-6">Verify Your Waste</h1>
