@@ -49,7 +49,14 @@ export default function Login() {
     if (account) {
       setWalletConnected(true);
       setLoggedIn(true);
-      router.push("/profile");
+      if (
+        [
+          "0xa2a7866e8F4d34FAA4fbd97a6547c1f44675127f",
+          "0x3A46fb6Dc1a01B4Bdcd92439994e0b2a51f1fAA6",
+        ].includes(account.address)
+      ) {
+        router.push("/admin");
+      } else router.push("/profile");
     }
   }, [account, router]);
 
