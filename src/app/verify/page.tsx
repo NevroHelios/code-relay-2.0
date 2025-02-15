@@ -84,19 +84,19 @@ export default function GarbageUpload() {
     }
   };
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center  p-6">
-      <h1 className="text-3xl font-bold mb-6">Verify Your Waste</h1>
-      <div className="p-8 rounded shadow-md w-full max-w-md bg-green-50/30 backdrop-blur-sm">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6">
+      <div className="bg-black bg-opacity-20 backdrop-blur-md rounded-xl shadow-lg p-8 w-full max-w-md">
+        <h1 className="text-3xl font-bold mb-6 text-green-200">Verify Your Waste</h1>
         <div
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onClick={handleClick}
-          className="mb-4 border-2 border-dashed border-gray-300 rounded p-6 text-center cursor-pointer"
+          className="mb-4 border-2 border-dashed border-green-300 rounded p-6 text-center cursor-pointer"
         >
           {file ? (
-            <p className="text-gray-700">{file.name}</p>
+            <p className="text-green-200">{file.name}</p>
           ) : (
-            <p className="text-gray-900">
+            <p className="text-green-200">
               Drag and drop an image here, or click to select a file
             </p>
           )}
@@ -111,7 +111,7 @@ export default function GarbageUpload() {
         <button
           onClick={handleUpload}
           disabled={!file || loading}
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded disabled:opacity-50"
+          className="w-full bg-green-600 text-white py-2 px-4 rounded disabled:opacity-20"
         >
           {loading ? "Processing..." : "Upload and Verify"}
         </button>

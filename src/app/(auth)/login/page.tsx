@@ -43,11 +43,20 @@ export default function Login() {
   ];
 
   const [loggedIn, setLoggedIn] = useState(false);
+  const [walletConnected, setWalletConnected] = useState(false);
 
   useEffect(() => {
     if (account) {
+      setWalletConnected(true);
       setLoggedIn(true);
-      router.push("/profile");
+      if (
+        [
+          "0xa2a7866e8F4d34FAA4fbd97a6547c1f44675127f",
+          "0x3A46fb6Dc1a01B4Bdcd92439994e0b2a51f1fAA6",
+        ].includes(account.address)
+      ) {
+        router.push("/admin");
+      } else router.push("/profile");
     }
   }, [account, router]);
 
@@ -64,8 +73,6 @@ export default function Login() {
     hidden: { opacity: 0, x: -20 },
     visible: {
       opacity: 1,
-      x: 0,
-      transition: { duration: 0.4, ease: "easeOut" },
     },
   };
 
@@ -74,7 +81,7 @@ export default function Login() {
       initial="hidden"
       animate="visible"
       variants={containerVariant}
-      className="min-h-screen flex items-center justify-center px-4"
+      className="flex items-center justify-center min-h-screen"
     >
       <motion.div
         variants={itemVariant}
@@ -88,18 +95,20 @@ export default function Login() {
         </p>
         <div className="flex flex-col gap-6">
           <ConnectButton client={client} wallets={wallets} />
-          <div className="mt-4">
-            <p className="text-green-700 font-semibold">
-              Wallet address:{" "}
-              <span className="font-semibold">{account?.address}</span>
-            </p>
-            <p className="text-green-600 font-semibold">
-              Wallet balance:{" "}
-              {isLoading
-                ? "Loading..."
-                : `${balance?.displayValue} ${balance?.symbol}`}
-            </p>
-          </div>
+          {walletConnected && (
+            <div className="mt-4">
+              <p className="text-green-700 font-semibold">
+                Wallet address:{" "}
+                <span className="font-semibold">{account?.address}</span>
+              </p>
+              <p className="text-green-600 font-semibold">
+                Wallet balance:{" "}
+                {isLoading
+                  ? "Loading..."
+                  : `${balance?.displayValue} ${balance?.symbol}`}
+              </p>
+            </div>
+          )}
         </div>
       </motion.div>
     </motion.div>

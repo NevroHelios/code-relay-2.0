@@ -39,9 +39,9 @@ const GoogleAuthPage = () => {
       initial="hidden"
       animate="visible"
       variants={containerVariant}
-      className="min-h-screen flex items-center justify-center bg-gray-50"
+      className="min-h-screen flex items-center justify-center "
     >
-      <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md mx-4">
+      <div className=" p-8 rounded-lg shadow-2xl w-full max-w-md mx-4">
         <motion.div
           variants={itemVariant}
           className="flex flex-col items-center space-y-6"

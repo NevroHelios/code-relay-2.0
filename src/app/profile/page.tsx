@@ -5,6 +5,8 @@ import { useActiveWallet, useDisconnect } from "thirdweb/react";
 import { client } from "@/app/client";
 import { sepolia } from "thirdweb/chains";
 import { motion } from "framer-motion"; // Import motion for animations
+import Link from "next/link";
+import Image from "next/image"; // Import Image component for the avatar
 
 export default function Profile() {
   const account = useActiveAccount();
@@ -19,11 +21,11 @@ export default function Profile() {
   if (!account) {
     return (
       <div className="min-h-screen flex items-center justify-center ">
-        <div className="bg-white p-8 rounded-xl shadow-lg">
+        <Link href={'/login'} className="bg-white p-8 rounded-xl shadow-lg">
           <p className="text-green-600 text-xl font-semibold">
             Please connect your wallet
           </p>
-        </div>
+        </Link>
       </div>
     );
   }
@@ -51,11 +53,28 @@ export default function Profile() {
       initial="hidden"
       animate="visible"
       variants={containerVariant}
-      className="min-h-screen p-8 flex items-center justify-center"
+      className="min-h-screen p-8 flex items-center justify-center relative"
     >
+      {/* Dummy User Avatar */}
+      
+
       <motion.div variants={itemVariant} className="max-w-2xl">
         <div className="bg-black bg-opacity-20 backdrop-blur-md rounded-lg shadow-lg p-8 space-y-6">
-          <div className="flex justify-between items-center mb-8">
+        
+        <div className="flex flex-row items-center space-x-24">
+        <Image
+          src="/dummy-user.png" // Replace with your dummy avatar image path
+          alt="User Avatar"
+          width={80}
+          height={80}
+          className="rounded-full border-2 border-green-500"
+        />
+          <h1 className="text-3xl font-bold text-green-200">
+              UserName
+            </h1>
+        </div>
+          <div className="flex justify-between items-center mt-10 mb-8">
+            
             <h1 className="text-3xl font-bold text-green-200">
               Wallet Profile
             </h1>
