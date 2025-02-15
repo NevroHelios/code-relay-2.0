@@ -17,101 +17,39 @@ const AdminDashboard: React.FC = () => {
   const address = useAddress();
   const connectWithMetamask = useMetamask();
   const { mutate: sendTransaction } = useSendTransaction();
-  const contractAddress = "0xaA0801BfA7F39501b95D2F7A5f27Ea78Fbe1226C";
+  const contractAddress = "0x9C4c3351636086d6087e94f57E46fB71df89e27B";
   const { contract, isLoading } = useContract(
     contractAddress,
     GarbageNFTAbi.abi
   );
 
+  console.log("Address:", address);
+  console.log(contract)
+
   const [tokenURI, setTokenURI] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [expiryDate, setExpiryDate] = useState<number>(0);
-  // Extra field added: rewardCategory
-  const [rewardCategory, setRewardCategory] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const createReward = () => {
+  const createReward = async () => {
     if (!contract) {
       alert("Contract not loaded");
       return;
     }
-    if (!address) {
-      connectWithMetamask();
-      return;
-    }
-    if (!tokenURI || !title || !description || !expiryDate || !rewardCategory) {
-      alert("Please fill in all fields");
-      return;
-    }
     setLoading(true);
-
-    // Prepare the transaction call taking the extra field into account.
-    const transaction = prepareContractCall({
-      contract,
-      method:
-        "function createReward(string _tokenURI, string _title, string _description, uint256 _expiryDate, string _category) returns (uint256)",
-      params: [tokenURI, title, description, expiryDate],
-    });
-
-    sendTransaction(transaction, {
-      onSuccess: async (tx) => {
-        console.log("Transaction successful:", tx);
-        const iface = new ethers.utils.Interface(GarbageNFTAbi.abi);
-        let rewardId: number | undefined;
-        for (const log of tx.receipt.logs) {
-          try {
-            const parsedLog = iface.parseLog(log);
-            if (parsedLog.name === "RewardCreated") {
-              rewardId = parsedLog.args.rewardId.toNumber();
-              break;
-            }
-          } catch (error) {
-            console.log("Error parsing log:", error);
-            continue;
-          }
-        }
-        if (rewardId === undefined) {
-          alert("Failed to retrieve rewardId from tx event logs");
-          setLoading(false);
-          return;
-        }
-        // Save the reward in MongoDB via API call
-        const response = await fetch("/api/nft/create", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            tokenId: rewardId,
-            tokenURI,
-            creator: address,
-            title,
-            description,
-            expiryDate,
-            rewardCategory,
-          }),
-        });
-        if (!response.ok) {
-          const errorData = await response.json();
-          alert(errorData.message || "Failed to save NFT in database");
-          setLoading(false);
-          return;
-        }
-        const savedNFT = await response.json();
-        console.log("NFT saved successfully:", savedNFT);
-        alert("Reward created successfully!");
-        setTokenURI("");
-        setTitle("");
-        setDescription("");
-        setExpiryDate(0);
-        setRewardCategory("");
-        setLoading(false);
-      },
-      onError: (error) => {
-        console.error("Transaction failed:", error);
-        alert(`Failed to create reward: ${error.message}`);
-        setLoading(false);
-      },
-    });
+    try {
+      // Ensure the parameters match the smart contract's createReward function signature.
+      const data = await contract.call(
+        "createReward",
+        [tokenURI, title, description, expiryDate]
+      );
+      console.log("Reward created:", data);
+    } catch (error) {
+      console.error("Failed to create reward:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleTokenURIChange = (e: ChangeEvent<HTMLInputElement>) =>
@@ -122,8 +60,6 @@ const AdminDashboard: React.FC = () => {
     setDescription(e.target.value);
   const handleExpiryDateChange = (e: ChangeEvent<HTMLInputElement>) =>
     setExpiryDate(Number(e.target.value));
-  const handleRewardCategoryChange = (e: ChangeEvent<HTMLInputElement>) =>
-    setRewardCategory(e.target.value);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -209,18 +145,6 @@ const AdminDashboard: React.FC = () => {
                   className="w-full p-2 border border-gray-300 text-black rounded-md mb-4"
                 />
               </div>
-              {/* <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Reward Category
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ex: Recycling, Energy Saving..."
-                  value={rewardCategory}
-                  onChange={handleRewardCategoryChange}
-                  className="w-full p-2 border border-gray-300 text-black rounded-md mb-4"
-                />
-              </div> */}
               <button
                 onClick={createReward}
                 className="w-full bg-gradient-to-r from-green-400 to-green-600 text-white py-2 px-4 rounded-lg hover:from-green-500 hover:to-green-700 transition duration-300 transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
