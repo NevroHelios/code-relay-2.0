@@ -10,7 +10,6 @@
     "seed": "node --loader ts-node/esm ./scripts/seed.ts"
   },
   "dependencies": {
-    "@google-cloud/vision": "^4.3.2",
     "@headlessui/react": "^2.2.0",
     "@hookform/resolvers": "^4.0.0",
     "@nomiclabs/hardhat-etherscan": "^3.1.8",
@@ -30,6 +29,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^16.4.7",
+    "formidable": "^3.5.2",
     "framer-motion": "^12.4.3",
     "gsap": "^3.12.7",
     "lodash": "^4.17.21",

@@ -67,9 +67,9 @@ export default function GarbageUpload() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center  p-6">
       <h1 className="text-3xl font-bold mb-6">Verify Your Waste</h1>
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+      <div className="p-8 rounded shadow-md w-full max-w-md bg-green-50/30 backdrop-blur-sm">
         <div
           onDrop={handleDrop}
           onDragOver={handleDragOver}
@@ -79,7 +79,7 @@ export default function GarbageUpload() {
           {file ? (
             <p className="text-gray-700">{file.name}</p>
           ) : (
-            <p className="text-gray-500">
+            <p className="text-gray-900">
               Drag and drop an image here, or click to select a file
             </p>
           )}
