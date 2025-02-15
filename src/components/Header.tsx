@@ -2,12 +2,26 @@
 
 import React, { useState, useEffect } from "react";
 import { FaBell, FaShareAlt, FaGlobe, FaBars, FaDiscord, FaTimes } from "react-icons/fa";
+import { SiEthereum } from "react-icons/si"; // Add this import
 import { navbarItems, dropdownItems } from "@/utilis/navbar";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import Preloader from "./Logo";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useActiveAccount, useWalletBalance } from "thirdweb/react";
+import { client } from "@/app/client";
+import { sepolia } from "thirdweb/chains";
 
 const Navbar = () => {
+  const router = useRouter();
+  const account = useActiveAccount();
+  const { data: balance, isLoading } = useWalletBalance({
+    client,
+    chain: sepolia,
+    address: account?.address || "0x0000000000000000000000000000000000000000",
+  });
+
   useEffect(() => {
     // Navbar container animation
     gsap.from("nav", {
@@ -80,6 +94,10 @@ const Navbar = () => {
     }
   };
 
+  const handleProfileClick = () => {
+    router.push('/'); // Changed from '/profile' to '/'
+  };
+
   return (
     <>
       <motion.nav
@@ -97,22 +115,48 @@ const Navbar = () => {
         {/* Desktop Menu */}
         <div className="site-menu hidden md:flex items-center">
           
-          <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">coins</div>
-          <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">about</div>
-          <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">collections</div>
-          {/* Centered login button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 bg-gradient-to-br from-green-950/40 to-green-700/40 
-                       backdrop-blur-sm px-4 py-2 rounded-xl hover:from-green-900 hover:to-green-600
-                       mx-8 md:mx-16"
-          >
-           
-            <span className="text-xl">Login</span>
-          </motion.button>
-
-          {/* <div className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">contact</div> */}
+            {/* <a href="/coins" className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">coins</a> */}
+            <a href="/#about" className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">about</a>
+            <a href="/#collections" className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">collections</a>
+          {/* Login Button or Profile Avatar with Balance */}
+          {account ? (
+            <div className="flex items-center gap-4 mx-8 md:mx-16">
+              <div className="flex items-center gap-2 bg-green-900/20 px-3 py-1 rounded-lg">
+                <SiEthereum className="text-green-500 text-xl" />
+                <span className="text-green-400 font-medium">
+                  {isLoading ? (
+                    <span className="animate-pulse">...</span>
+                  ) : (
+                    `${Number(balance?.displayValue).toFixed(4)}`
+                  )}
+                </span>
+              </div>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleProfileClick}
+                className="cursor-pointer"
+              >
+                <Image
+                  src="/dummy-user.png"
+                  alt="User Avatar"
+                  width={40}
+                  height={40}
+                  className="rounded-full border-2 border-green-500"
+                />
+              </motion.div>
+            </div>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-2 bg-gradient-to-br from-green-950/40 to-green-700/40 
+                         backdrop-blur-sm px-4 py-2 rounded-xl hover:from-green-900 hover:to-green-600
+                         mx-8 md:mx-16"
+            >
+              <span className="text-xl">Login</span>
+            </motion.button>
+          )}
         </div>
         
         {/* Mobile Menu Button */}
@@ -157,21 +201,63 @@ const Navbar = () => {
                 about
               </motion.div>
               
-              {/* Mobile Login Button */}
-              <motion.button
-                variants={{
-                  open: { opacity: 1, y: 0 },
-                  closed: { opacity: 0, y: 20 }
-                }}
-                transition={{ delay: 0.4 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 bg-gradient-to-br from-green-950/40 to-green-700/40 
-                           backdrop-blur-sm px-6 py-3 rounded-xl hover:from-green-900 hover:to-green-600"
-              >
-                
-                <span className="text-lg">Login</span>
-              </motion.button>
+              {/* Mobile Login Button or Profile Avatar */}
+              {account ? (
+                <>
+                  <motion.div
+                    variants={{
+                      open: { opacity: 1, y: 0 },
+                      closed: { opacity: 0, y: 20 }
+                    }}
+                    transition={{ delay: 0.35 }}
+                    className="flex items-center gap-2 bg-green-900/20 px-3 py-1 rounded-lg"
+                  >
+                    <SiEthereum className="text-green-500 text-xl" />
+                    <span className="text-green-400 font-medium">
+                      {isLoading ? (
+                        <span className="animate-pulse">...</span>
+                      ) : (
+                        `${Number(balance?.displayValue).toFixed(4)}`
+                      )}
+                    </span>
+                  </motion.div>
+                  <motion.a
+                    variants={{
+                      open: { opacity: 1, y: 0 },
+                      closed: { opacity: 0, y: 20 }
+                    }}
+                    transition={{ delay: 0.4 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleProfileClick}
+                    className="cursor-pointer"
+                    href="/"
+                  >
+                    <Image
+                      src="/dummy-user.png"
+                      alt="User Avatar"
+                      width={50}
+                      height={50}
+                      className="rounded-full border-2 border-green-500"
+                      
+                    />
+                  </motion.a>
+                </>
+              ) : (
+                <motion.button
+                  variants={{
+                    open: { opacity: 1, y: 0 },
+                    closed: { opacity: 0, y: 20 }
+                  }}
+                  transition={{ delay: 0.4 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2 bg-gradient-to-br from-green-950/40 to-green-700/40 
+                             backdrop-blur-sm px-6 py-3 rounded-xl hover:from-green-900 hover:to-green-600"
+                >
+                  <span className="text-lg">Login</span>
+                </motion.button>
+              )}
               
               <motion.div
                 variants={{

@@ -7,6 +7,7 @@ import { sepolia } from "thirdweb/chains";
 import { motion } from "framer-motion"; // Import motion for animations
 import Link from "next/link";
 import Image from "next/image"; // Import Image component for the avatar
+import { SiEthereum } from "react-icons/si"; // Add this import at the top
 
 export default function Profile() {
   const account = useActiveAccount();
@@ -98,13 +99,16 @@ export default function Profile() {
 
             <div className="bg-transparent p-4 rounded-lg">
               <p className="text-sm text-green-200 font-medium mb-1">Balance</p>
-              <p className="text-green-200 text-xl font-semibold">
-                {isLoading ? (
-                  <span className="animate-pulse">Loading...</span>
-                ) : (
-                  `${balance?.displayValue} ${balance?.symbol}`
-                )}
-              </p>
+              <div className="flex items-center gap-2">
+                <SiEthereum className="text-green-500 text-2xl" />
+                <p className="text-green-200 text-xl font-semibold">
+                  {isLoading ? (
+                    <span className="animate-pulse">Loading...</span>
+                  ) : (
+                    `${balance?.displayValue} ${balance?.symbol}`
+                  )}
+                </p>
+              </div>
             </div>
           </div>
         </div>
