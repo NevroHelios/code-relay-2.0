@@ -36,17 +36,7 @@ function ApprovedDashboard() {
   console.log(allrewards);
 
   return (
-    <div>
-      {isPending ? (
-        <p>Loading...</p>
-      ) : (
-        <div>
-          {allrewards?.map((reward: any, idx: number) => {
-            <div>{reward.claimed}</div>;
-          })}
-        </div>
-      )}
-    </div>
+    <div>{isPending ? <p>Loading...</p> : <div>{allrewards[6]}</div>}</div>
   );
 }
 

@@ -87,11 +87,13 @@ const Navbar = () => {
         initial="hidden"
         animate="visible"
         className="fixed w-full h-16 md:h-24 px-4 md:px-10 flex justify-between items-center 
-                   font-sans uppercase font-bold text-green-500 z-50 bg-black/20 backdrop-blur-sm z-[900]"
+                   font-sans uppercase font-bold text-green-500 z-50 z-[900]"
       >
-        <div className="site-info w-40 h-40 text-sm md:text-xl">
+        <div className="site-info w-20  text-sm md:text-xl">
           <Preloader/>
         </div>
+        <a>
+        Green Sycn</a>
         
         {/* Desktop Menu */}
         <div className="site-menu hidden md:flex items-center">
