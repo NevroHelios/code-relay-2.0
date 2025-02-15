@@ -3,9 +3,10 @@ import { Geist, Geist_Mono, Play } from "next/font/google";
 import "./globals.css";
 import { ThirdwebProvider } from "thirdweb/react";
 import Navbar from "@/components/Header";
-import Footer from "@/components/Footer";
+import Footer from "@/components/footer";
 import { Inter, Montserrat } from 'next/font/google';
 import HeroSection from '@/components/hero';
+import BackgroundVideo from '@/components/BackgroundVideo';
 
 const geist = Geist({
   variable: "--font-geist-sans",
@@ -37,14 +38,16 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet" />
       </head>
       <body
-        className={`${geist.variable} ${geistMono.variable} ${play.variable} ${montserrat.className} antialiased`}
+        className={`${geist.variable} ${geistMono.variable} ${play.variable} ${montserrat.className} antialiased relative`}
       >
         <ThirdwebProvider>
-          <Navbar/>
-          <div className="z-[-1]">
+          <BackgroundVideo opacity={0.8} />
+          <Navbar />
+          <div>
             <HeroSection />
           </div>
           {children}
+          
         </ThirdwebProvider>
       </body>
     </html>

@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Hero from "@/components/Hero-new";
 import About from "@/components/about";
+import Team from "@/components/collection";
+import Footer from "@/components/footer";
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -23,6 +25,8 @@ export default function HomePage() {
         <>
           <Hero />
           <About />
+          <Team/>
+          <Footer/>>
         </>
       )}
     </main>

@@ -8,16 +8,16 @@ import ParticleImage, {
   forces,
   ParticleForce,
 } from 'react-particle-image';
-import logo from '../../../public/logo.svg';
+import logo from '../../../public/Layer 1.svg';
 
 const particleOptions: ParticleOptions = {
   filter: ({ x, y, image }) => {
     const pixel = image.get(x, y);
     return pixel.b > 50;
   },
-  color: ({ x, y, image }) => '#fff',
+  color: ({ x, y, image }) => '#89fda4',
   radius: () => Math.random() * 0.5 + 0.5,
-  mass: () => 40,
+  mass: () => 30,
   friction: () => 0.15,
   initialPosition: ({ canvasDimensions }) => {
     return new Vector(canvasDimensions.width / 2, canvasDimensions.height / 2);
@@ -29,7 +29,7 @@ const motionForce = (x: number, y: number): ParticleForce => {
 };
 
 const About = () => {
-  const { innerWidth } = useWindowSize();
+  const { innerWidth = 0 } = useWindowSize();
   const glitch = useGlitch({
     playMode: 'always',
     createContainers: true,
@@ -105,17 +105,48 @@ const About = () => {
             </div>
           </motion.div>
 
-          <div className="grid w-full grid-cols-1 gap-8 md:gap-16 lg:grid-cols-12">
+          <div className="flex flex-col items-center gap-2">
             <motion.div 
               variants={fadeInUp}
-              className="order-2 lg:order-1 lg:col-span-7"
+              className="w-full max-w-full"
             >
-              <h2 className="mb-4 font-pixelate text-xl md:text-2xl font-bold uppercase text-green-400">
+              {innerWidth > 1024 ? (
+                <ParticleImage
+                  src={logo.src}
+                  width={500}
+                  height={100}
+                  entropy={2}
+                  maxParticles={4000}
+                  particleOptions={particleOptions}
+                  mouseMoveForce={motionForce}
+                  touchMoveForce={motionForce}
+                  backgroundColor="transparent"
+                  className="w-full"
+                />
+              ) : (
+                <span ref={glitch.ref}>
+                  <Image
+                    src={logo}
+                    alt="Binary Hackathon"
+                    width={200}
+                    height={200}
+                    className="w-full h-auto"
+                    priority
+                  />
+                </span>
+              )}
+            </motion.div>
+
+            <motion.div 
+              variants={fadeInUp}
+              className="w-full max-w-2xl text-center"
+            >
+              <h2 className="mb-6 font-pixelate text-xl md:text-2xl font-bold uppercase text-green-400">
                 hi everyone
               </h2>
               <motion.p 
                 variants={fadeInUp}
-                className="font-pixelate font-bold text-white text-base md:text-lg"
+                className="font-pixelate font-bold text-white text-base md:text-lg mb-6"
               >
                 Binary is the annual hackathon of Kalyani Government Engineering College. It aims to
                 be a stage for college students to showcase their creativity and resolve societal
@@ -124,44 +155,12 @@ const About = () => {
               </motion.p>
               <motion.p 
                 variants={fadeInUp}
-                className="my-5 mb-4 font-pixelate font-bold text-green-400 text-base md:text-lg"
+                className="font-pixelate font-bold text-green-400 text-base md:text-lg"
               >
                 We intend to host about 300 students with expertise in diverse domains of computer
                 science. The BINARY will take place in the first half of March at the Kalyani
                 Government Engineering College.
               </motion.p>
-            </motion.div>
-
-            <motion.div 
-              variants={fadeInUp}
-              className="order-1 lg:order-2 lg:col-span-5 flex items-center justify-center"
-            >
-              <div className="w-full max-w-md">
-                {innerWidth > 1024 ? (
-                  <ParticleImage
-                    src={logo.src}
-                    width={innerWidth > 1536 ? 300 : 250}
-                    entropy={20}
-                    maxParticles={innerWidth > 1536 ? 4000 : 3000}
-                    particleOptions={particleOptions}
-                    mouseMoveForce={motionForce}
-                    touchMoveForce={motionForce}
-                    backgroundColor="transparent"
-                    className="w-full"
-                  />
-                ) : (
-                  <span ref={glitch.ref}>
-                    <Image
-                      src={logo}
-                      alt="Binary Hackathon"
-                      width={innerWidth > 768 ? 300 : 200}
-                      height={innerWidth > 768 ? 300 : 200}
-                      className="w-auto h-auto"
-                      priority
-                    />
-                  </span>
-                )}
-              </div>
             </motion.div>
           </div>
         </div>
