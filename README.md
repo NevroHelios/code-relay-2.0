@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌱 GreenToken: Web3 Rewards for Eco-Warriors 🌍
 
-## Getting Started
+## 📋 Project Overview
 
-First, run the development server:
+https://github.com/user-attachments/assets/ecb9b0b1-daea-4db4-9265-bb8f5e40e381
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+GreenToken is a revolutionary web3 platform that incentivizes students to participate in eco-friendly activities through blockchain-based rewards. By combining sustainability with decentralized technology, we're creating a transparent and engaging way to promote environmental consciousness on campus.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔑 Key Features
 
-## Learn More
+### 🗑️ Verifiable Eco-Actions
+- QR codes on dustbins for tracking participation
+- Geo-coordinate verification to prevent fraud
+- Photo/video submission for activity validation
 
-To learn more about Next.js, take a look at the following resources:
+### 🏆 Immutable Reward System
+- NFT-based Green Tokens as rewards
+- Transparent and fair distribution
+- Blockchain-secured achievement records
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 💰 Utility & Benefits
+- DeFi capabilities for token holders
+- Campus discounts and privileges
+- Priority access to facilities (labs, libraries)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔄 How It Works
 
-## Deploy on Vercel
+1. Students participate in eco-friendly activities (e.g., garbage collection)
+2. They scan QR codes at designated locations
+3. Our system verifies the action through location data and photo/video evidence
+4. Smart contracts automatically mint and distribute Green Tokens
+5. Students can use tokens for various benefits or hold as investment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🚀 Scalability Plan
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Phase 1: Institution Level
+- Pilot program within our campus
+- Build initial user base and refine system
+
+### Phase 2: Community Expansion
+- Partner with other educational institutions
+- Create inter-campus competitions and collaborations
+
+### Phase 3: Carbon Credit Integration
+- Help institutions gain carbon credits for eco-projects
+- Connect with businesses seeking to offset carbon footprint
+- Generate revenue while expanding environmental impact
+
+## 💡 Why Web3?
+
+Our blockchain implementation ensures:
+- Immutable record of eco-contributions
+- Fair and transparent reward distribution
+- Protection against manipulation or favoritism
+- Digital proof of environmental impact
+
+## 👥 Target Users
+
+- Environmentally conscious students
+- Educational institutions seeking green initiatives
+- Businesses looking for carbon offset opportunities
+- Communities wanting to gamify sustainability
+
+## 🔮 Future Developments
+
+- Enhanced verification through AI analysis of video submissions
+- Mobile app for seamless participation
+- Marketplace for trading tokens and benefits
+- Integration with global environmental initiatives
+
+## 💻 Tech Stack
+
+- Blockchain: Ethereum/Polygon
+- Smart Contracts: Solidity
+- Frontend: React
+- Backend: Node.js
+- Authentication: Web3 wallets
+- Storage: IPFS for media files
+
+## 🌟 Join the Green Revolution!
+
+Help us create a cleaner, more sustainable future while leveraging the power of web3 technology!
+
+---
+
+*GreenToken: Where Ecology Meets Technology* 🌿⛓️
