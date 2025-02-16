@@ -5,9 +5,9 @@ async function main() {
   await hre.run('compile');
 
   // Get the contract to deploy.
-  const GarbageNFT = await hre.ethers.getContractFactory("GarbageNFT");
+  const MyContract = await hre.ethers.getContractFactory("MyContract");
   console.log("Deploying contract...");
-  const contract = await GarbageNFT.deploy(); // add constructor parameters if any
+  const contract = await MyContract.deploy(); // add constructor parameters if any
   await contract.deployed();
   console.log("Contract deployed to:", contract.address);
 }

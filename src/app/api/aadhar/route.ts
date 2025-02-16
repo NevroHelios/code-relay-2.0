@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/mongodb'
 import { AadharDetails } from '@/models/Aadhar'
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest, res : NextResponse) {
   try {
     // Connect to MongoDB
     await dbConnect()
@@ -11,18 +11,25 @@ export async function POST(req: Request) {
     const { firstName, lastName, aadharNumber } = await req.json()
 
     // Check if the aadharNumber already exists
-    const existing = await AadharDetails.findOne({ aadharNumber })
-    if (existing) {
-      // Aadhar is not unique, redirect back to "admin-new"
-      return NextResponse.redirect(new URL('/admin-new', req.url))
-    } else {
-      // Aadhar is unique, create the new record
-      await AadharDetails.create({ firstName, lastName, aadharNumber })
-      // Forward to the login route
-      return NextResponse.redirect(new URL('/login', req.url))
+    const existing = await AadharDetails.findOne({ 
+      firstName : firstName,
+      lastName : lastName
+    })
+    if(existing){
+      if(existing.isVerified == true){
+        return true;
+      }
+      existing.isVerified = true;
     }
+    const newaadhar = new AadharDetails({
+      firstName : firstName,
+      lastName : lastName,
+      isVerified : true
+    })
+    await newaadhar.save();
+    return NextResponse.json({success : true, message : "Aadhar verified successfully!"}, {status : 200})
   } catch (error) {
     console.error(error)
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+    return NextResponse.json({ success : false, error: 'Internal Server Error' }, { status: 500 })
   }
 }

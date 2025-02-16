@@ -19,9 +19,7 @@ const AdminDashboard: React.FC = () => {
   const connectWithMetamask = useMetamask();
   const { mutate: sendTransaction } = useSendTransaction();
   const contractAddress = "0x9C4c3351636086d6087e94f57E46fB71df89e27B";
-  const { contract, isLoading } = useContract(
-    contractAddress
-  );
+  const { contract, isLoading } = useContract(contractAddress);
   const address1 = useActiveAccount()?.address;
   const address = address1 || address2;
   console.log("Address:", address);
@@ -56,19 +54,24 @@ const AdminDashboard: React.FC = () => {
       // Prepare reward details to be sent to MongoDB.
       // Adjust the transaction id extraction as per your data structure.
       const rewardDetails = {
-        nftAddress: contractAddress,
+        from: data.receipt.from,
         tokenURI,
-        transactionId: data?.transactionHash || data?.hash || "",
+        transactionId: data.receipt.transactionHash || "",
         title,
         description,
+        expiryDate,
       };
 
       // Post the reward details to the MongoDB endpoint.
-      await fetch("/api/rewards", {
+      const response = await fetch("/api/rewards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(rewardDetails),
       });
+      const result = await response.json();
+      if (result.success == true) {
+        console.log("NFT successfully created!!");
+      }
     } catch (error) {
       console.error("Failed to create reward:", error);
     } finally {

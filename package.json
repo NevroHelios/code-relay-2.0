@@ -55,6 +55,7 @@
     "react-icons": "^5.4.0",
     "react-particle-image": "^1.0.2",
     "react-powerglitch": "^1.1.0",
+    "react-qr-barcode-scanner": "^2.0.0",
     "react-qr-reader": "^3.0.0-beta-1",
     "react-qr-scanner": "^1.0.0-alpha.11",
     "react-type-animation": "^3.2.0",

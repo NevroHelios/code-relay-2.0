@@ -1,15 +1,10 @@
 export interface NFT {
-  tokenId: number;
   tokenURI: string;
   creator: string;
-  claimedBy: string | null;
-  createdAt: Date;
   description?: string;
   title?: string;
-  attributes?: {
-    trait_type: string;
-    value: string | number;
-  }[];
+  isClaimed: boolean;
+  validity : Date;
 }
 
 export interface CreateNFTRequest {

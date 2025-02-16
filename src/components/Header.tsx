@@ -9,18 +9,26 @@ import gsap from "gsap";
 import Preloader from "./Logo";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useAddress, useMetamask, useDisconnect, useBalance } from "@thirdweb-dev/react";
+import { useAddress, useMetamask, useDisconnect, useBalance, useContract } from "@thirdweb-dev/react";
 import { Sepolia } from "@thirdweb-dev/chains";
+import { ThirdwebProvider, useActiveAccount } from "thirdweb/react";
+import { admins } from "scripts/admins";
 
 const Navbar = () => {
   const router = useRouter();
+  const address2 = useAddress();
   const connectWithMetamask = useMetamask();
-  const address = useAddress();
-  const disconnect = useDisconnect();
-  const { data: balance, isLoading } = useBalance(address, Sepolia);
+  const contractAddress = "0x9C4c3351636086d6087e94f57E46fB71df89e27B";
+  const { contract, isLoading } = useContract(contractAddress);
+  const address1 = useActiveAccount()?.address;
+  const address = address1 || address2;
+  console.log("Address:", address);
+  console.log(contract);
+  const { data: balance, isLoading : loading } = useBalance(address, Sepolia);
 
   const [coinBalance, setCoinBalance] = useState<number>(0);
   const [isAadhaarVerified, setIsAadhaarVerified] = useState<boolean>(false);
+  const [username, setusername] = useState<string>("");
 
   // Auto reconnect on page reload if wallet was previously connected
   useEffect(() => {
@@ -42,18 +50,33 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const fetchCoinBalance = async () => {
+    const fetchCoinBalance = async (address) => {
       try {
-        const response = await fetch('/api/coin-balance');
+        console.log(address);
+        const body = {
+          walletAddress: address
+        }
+        const response = await fetch('/api/userfind', {
+          method: 'POST',
+          headers: {
+            'Content-Type' : 'application.json'
+          },
+          body : JSON.stringify(body)
+        });
         const data = await response.json();
-        setCoinBalance(data.balance);
+        console.log(data);
+        if(data.success == true){
+          setCoinBalance(data.user.totalPoints);
+          setusername(data.user.name);
+        }
+        
       } catch (error) {
         console.error('Error fetching coin balance:', error);
       }
     };
 
     if (address) {
-      fetchCoinBalance();
+      fetchCoinBalance(address);
     }
   }, [address]);
 
@@ -101,24 +124,24 @@ const Navbar = () => {
 
   const containerVariants = {
     hidden: { y: -100, opacity: 0 },
-    visible: { 
-      y: 0, 
+    visible: {
+      y: 0,
       opacity: 1,
       transition: {
         duration: 0.8,
         staggerChildren: 0.1,
-        delay: 0.5 // Reduced delay to match new timing
-      }
-    }
+        delay: 0.5, // Reduced delay to match new timing
+      },
+    },
   };
 
   const itemVariants = {
     hidden: { y: -20, opacity: 0 },
-    visible: { 
-      y: 0, 
+    visible: {
+      y: 0,
       opacity: 1,
-      transition: { duration: 0.5 }
-    }
+      transition: { duration: 0.5 },
+    },
   };
 
   const mobileMenuVariants = {
@@ -128,8 +151,8 @@ const Navbar = () => {
       transition: {
         type: "spring",
         stiffness: 400,
-        damping: 40
-      }
+        damping: 40,
+      },
     },
     open: {
       opacity: 1,
@@ -137,9 +160,9 @@ const Navbar = () => {
       transition: {
         type: "spring",
         stiffness: 400,
-        damping: 40
-      }
-    }
+        damping: 40,
+      },
+    },
   };
 
   const handleProfileClick = () => {
@@ -154,18 +177,29 @@ const Navbar = () => {
         animate="visible"
         className="fixed w-full h-16 md:h-24 px-4 md:px-10 flex justify-between items-center 
                    font-sans uppercase font-bold text-green-500 z-50 bg-black/20 backdrop-blur-sm z-[900]"
-      ><div className="flex items-center gap-4">
-        <div className="site-info w-20 text-sm md:text-xl">
-          <Preloader/>
+      >
+        <div className="flex items-center gap-4">
+          <div className="site-info w-20 text-sm md:text-xl">
+            <Preloader />
+          </div>
+          <div className="text-xl ">Green Sync</div>
         </div>
-        <div className="text-xl ">Green Sync</div></div>
-        
+
         {/* Desktop Menu */}
         <div className="site-menu hidden md:flex items-center">
-          
-            {/* <a href="/coins" className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">coins</a> */}
-            <a href="/#about" className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">about</a>
-            <a href="/#collections" className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">collections</a>
+          {/* <a href="/coins" className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400">coins</a> */}
+          <a
+            href="/#about"
+            className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400"
+          >
+            about
+          </a>
+          <a
+            href="/#collections"
+            className="menu-item ml-8 md:ml-16 text-sm md:text-xl hover:text-green-400"
+          >
+            collections
+          </a>
           {/* Login Button or Profile Avatar with Balance */}
           <div className="flex items-center">
             {address ? (
@@ -232,7 +266,7 @@ const Navbar = () => {
             )}
           </div>
         </div>
-        
+
         {/* Mobile Menu Button */}
         <motion.button
           whileTap={{ scale: 0.9 }}
@@ -257,7 +291,7 @@ const Navbar = () => {
               <motion.div
                 variants={{
                   open: { opacity: 1, y: 0 },
-                  closed: { opacity: 0, y: 20 }
+                  closed: { opacity: 0, y: 20 },
                 }}
                 transition={{ delay: 0.2 }}
                 className="text-2xl hover:text-green-400"
@@ -267,21 +301,21 @@ const Navbar = () => {
               <motion.div
                 variants={{
                   open: { opacity: 1, y: 0 },
-                  closed: { opacity: 0, y: 20 }
+                  closed: { opacity: 0, y: 20 },
                 }}
                 transition={{ delay: 0.3 }}
                 className="text-2xl hover:text-green-400"
               >
                 about
               </motion.div>
-              
+
               {/* Mobile Login Button or Profile Avatar */}
               {address ? (
                 <>
                   <motion.div
                     variants={{
                       open: { opacity: 1, y: 0 },
-                      closed: { opacity: 0, y: 20 }
+                      closed: { opacity: 0, y: 20 },
                     }}
                     transition={{ delay: 0.35 }}
                     className="flex items-center gap-2 bg-green-900/20 px-3 py-1 rounded-lg"
@@ -295,20 +329,33 @@ const Navbar = () => {
                       )}
                     </span>
                   </motion.div>
-                  <motion.div
-                    variants={{
-                      open: { opacity: 1, y: 0 },
-                      closed: { opacity: 0, y: 20 }
-                    }}
-                    transition={{ delay: 0.4 }}
-                    className="text-2xl hover:text-green-400"
-                  >
-                    Coins: {coinBalance}
-                  </motion.div>
+                  {admins.includes(address) ? (
+                    <motion.div
+                      variants={{
+                        open: { opacity: 1, y: 0 },
+                        closed: { opacity: 0, y: 20 },
+                      }}
+                      transition={{ delay: 0.4 }}
+                      className="text-2xl hover:text-green-400"
+                    >
+                      Balance : {balance?.displayValue} {balance?.symbol}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      variants={{
+                        open: { opacity: 1, y: 0 },
+                        closed: { opacity: 0, y: 20 },
+                      }}
+                      transition={{ delay: 0.4 }}
+                      className="text-2xl hover:text-green-400"
+                    >
+                      Coins: {coinBalance}
+                    </motion.div>
+                  )}
                   <motion.a
                     variants={{
                       open: { opacity: 1, y: 0 },
-                      closed: { opacity: 0, y: 20 }
+                      closed: { opacity: 0, y: 20 },
                     }}
                     transition={{ delay: 0.4 }}
                     whileHover={{ scale: 1.05 }}
@@ -319,11 +366,10 @@ const Navbar = () => {
                   >
                     <Image
                       src="/dummy-user.png"
-                      alt="User Avatar"
+                      alt={username}
                       width={50}
                       height={50}
                       className="rounded-full border-2 border-green-500"
-
                     />
                   </motion.a>
                   <button
@@ -337,7 +383,7 @@ const Navbar = () => {
                 <motion.button
                   variants={{
                     open: { opacity: 1, y: 0 },
-                    closed: { opacity: 0, y: 20 }
+                    closed: { opacity: 0, y: 20 },
                   }}
                   transition={{ delay: 0.4 }}
                   whileHover={{ scale: 1.05 }}
@@ -349,18 +395,18 @@ const Navbar = () => {
                   <span className="text-lg">Login</span>
                 </motion.button>
               )}
-              
+
               <motion.div
                 variants={{
                   open: { opacity: 1, y: 0 },
-                  closed: { opacity: 0, y: 20 }
+                  closed: { opacity: 0, y: 20 },
                 }}
                 transition={{ delay: 0.5 }}
                 className="text-2xl hover:text-green-400"
               >
                 contact
               </motion.div>
-            </div>  
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -368,4 +414,12 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default function Finalnavbar(){
+  return(
+    <ThirdwebProvider>
+      <Navbar/>
+    </ThirdwebProvider>
+  )
+}
+
+
