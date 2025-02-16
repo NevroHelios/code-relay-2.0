@@ -8,6 +8,7 @@ import Image from "next/image";
 import { SiEthereum } from "react-icons/si";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import {useEffect} from 'react';
 
 export default function Profile() {
   const address = useAddress();
@@ -16,13 +17,14 @@ export default function Profile() {
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const connectWithMetamask = useMetamask();
+  const [coinBalance, setCoinBalance] = useState<number>(0);
 
   const handleDisconnect = async () => {
     try {
       setIsLoggingOut(true);
       
       // Clear local storage
-      window.localStorage.removeItem("isWalletConnected");
+      // window.localStorage.removeItem("isWalletConnected");
       
       // Disconnect wallet
       await disconnect();
@@ -45,6 +47,37 @@ export default function Profile() {
   if (!address) {
      connectWithMetamask();
   }
+
+  useEffect(() => {
+    const fetchCoinBalance = async (address) => {
+      try {
+        console.log(address);
+        const body = {
+          walletAddress: address
+        }
+        const response = await fetch('/api/userfind', {
+          method: 'POST',
+          headers: {
+            'Content-Type' : 'application.json'
+          },
+          body : JSON.stringify(body)
+        });
+        const data = await response.json();
+        console.log(data);
+        if(data.success == true){
+          setCoinBalance(data.user.totalPoints);
+          setusername(data.user.name);
+        }
+        
+      } catch (error) {
+        console.error('Error fetching coin balance:', error);
+      }
+    };
+
+    if (address) {
+      fetchCoinBalance(address);
+    }
+  }, [address]);
 
   const containerVariant = {
     hidden: { opacity: 0, y: -20 },
@@ -120,10 +153,28 @@ export default function Profile() {
             </div>
 
             <div className="bg-transparent p-4 rounded-lg">
-              <p className="text-sm text-green-200 font-medium mb-1">Balance</p>
+              <p className="text-sm text-green-200 font-medium mb-1">Coins</p>
+
               <div className="flex items-center gap-2">
-                <SiEthereum className="text-green-500 text-2xl" />
-                <p className="text-green-200 text-xl font-semibold">
+                {/* Green Token Logo */}
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="12" cy="12" r="10" fill="#22C55E" /> {/* Green circle */}
+                <path
+                  d="M12 6L14 10L18 11L15 14L16 18L12 16L8 18L9 14L6 11L10 10L12 6Z"
+                  fill="#FFFFFF"
+                /> {/* Star shape inside the circle */}
+              </svg>
+
+              {/* Coin Balance Text */}
+              <span className="text-green-400 font-medium">Coins: {coinBalance}</span>
+                <SiEthereum className="text-green-500 text-2xl hidden" />
+                <p className="text-green-200 text-xl font-semibold hidden">
                   {isLoading ? (
                     <span className="animate-pulse">Loading...</span>
                   ) : (

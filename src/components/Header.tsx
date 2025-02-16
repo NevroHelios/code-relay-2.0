@@ -205,20 +205,34 @@ const Navbar = () => {
             {address ? (
               <>
                 <div className="flex items-center gap-2 bg-green-900/20 px-3 py-1 rounded-lg">
-                  <SiEthereum className="text-green-500 text-xl" />
-                  <span className="text-green-400 font-medium">
+                  <SiEthereum className="text-green-500 text-xl hidden" />
+                  <span className="text-green-400 font-medium hidden">
                     {isLoading ? (
                       <span className="animate-pulse">...</span>
                     ) : (
-                      `${Number(balance?.displayValue).toFixed(4)}`
+                      `${(balance?.displayValue)}`
                     )}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 bg-green-900/20 px-3 py-1 rounded-lg">
-                  <span className="text-green-400 font-medium">
-                    Coins: {coinBalance}
-                  </span>
-                </div>
+  {/* Green Token Logo */}
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle cx="12" cy="12" r="10" fill="#22C55E" /> {/* Green circle */}
+    <path
+      d="M12 6L14 10L18 11L15 14L16 18L12 16L8 18L9 14L6 11L10 10L12 6Z"
+      fill="#FFFFFF"
+    /> {/* Star shape inside the circle */}
+  </svg>
+
+  {/* Coin Balance Text */}
+  <span className="text-green-400 font-medium">Coins: {coinBalance}</span>
+</div>
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -320,12 +334,12 @@ const Navbar = () => {
                     transition={{ delay: 0.35 }}
                     className="flex items-center gap-2 bg-green-900/20 px-3 py-1 rounded-lg"
                   >
-                    <SiEthereum className="text-green-500 text-xl" />
-                    <span className="text-green-400 font-medium">
+                    <SiEthereum className="text-green-500 text-xl hidden" />
+                    <span className="text-green-400 font-medium hidden">
                       {isLoading ? (
                         <span className="animate-pulse">...</span>
                       ) : (
-                        `${Number(balance?.displayValue).toFixed(4)}`
+                        `${(balance?.displayValue)}`
                       )}
                     </span>
                   </motion.div>
